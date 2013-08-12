@@ -1,0 +1,14 @@
+[
+    {   
+        "caption": "Django: Run Server",
+        "command": "django_run"
+    },
+    {   
+        "caption": "Django: Sync Database",
+        "command": "django_syncdb"
+    },    
+    {   
+        "caption": "Django: Migrate Database",
+        "command": "django_migrate"
+    }        
+]
