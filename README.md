@@ -1,6 +1,7 @@
 # DjangoCommands for Sublime Text 2
 
-This tool is a sublime wrapper around manage.py commands. 
+This tool is a Sublime Text 2 wrapper around django manage.py commands. 
+
 With it you can run django commands like runserver, syncdb, migrate and so on from Command Palette.
 
 
@@ -8,3 +9,7 @@ With it you can run django commands like runserver, syncdb, migrate and so on fr
 
  * python_bin: path to python interpreter
  * manage_py: path to manage.py file
+
+
+# What's supported?
+
