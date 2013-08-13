@@ -10,6 +10,3 @@ With it you can run django commands like runserver, syncdb, migrate and so on fr
  * python_bin: path to python interpreter
  * manage_py: path to manage.py file
 
-
-# What's supported?
-
