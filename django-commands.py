@@ -24,29 +24,44 @@ def find_manage_py():
 
 
 class DjangoCommand(sublime_plugin.WindowCommand):
-  
-    def run_command(self, action, use_terminal=False):
+    def run_command(self, command, use_terminal=False):
         python_bin, manage_py = read_settings()    
-        thread = CommandThread(action, python_bin, manage_py, use_terminal)
+        thread = CommandThread(command, python_bin, manage_py, use_terminal)
         thread.start()
 
 
 class DjangoRunCommand(DjangoCommand):
 
     def run(self):
-        self.run_command('runserver', True)
+        self.run_command(['runserver'], True)
 
 
 class DjangoSyncdbCommand(DjangoCommand):
 
     def run(self):
-        self.run_command('syncdb')
+        self.run_command(['syncdb'])
 
 
 class DjangoMigrateCommand(DjangoCommand):
 
     def run(self):
-        self.run_command('migrate')
+        self.run_command(['migrate'])
+
+
+class DjangoCustomCommand(DjangoCommand):  
+    
+    def run(self):
+        self.window.show_input_panel("Django manage command", "",
+                                     self.on_input, None, None)
+
+    def on_input(self, command):
+        command = str(command)  # avoiding unicode
+        if command.strip() == "":        
+            return
+        import shlex
+        command_splitted = shlex.split(command)
+        print command_splitted
+        self.run_command(command_splitted, True)
 
 
 class CommandThread(threading.Thread):
@@ -58,37 +73,14 @@ class CommandThread(threading.Thread):
         self.use_terminal = use_terminal
         threading.Thread.__init__(self)
 
-    @classmethod
-    def speak_output(cls, lines, errlines):
-        for line in errlines:
-            print line
-
-        for line in lines:
-            print line
-
-
     def run_and_output_to_terminal(self, command):
         subprocess.Popen(command)
-        
-
-    def run_and_output_to_sublime(self, command):
-        proc = subprocess.Popen(command,
-                                stdout=subprocess.PIPE, 
-                                stderr=subprocess.PIPE,
-                                shell=True)
-        output, eoutput = proc.communicate()
-
-        lines = [line for line in output.split('\n')]
-        elines = [line for line in eoutput.split('\n')]
-
-        sublime.set_timeout(lambda: self.speak_output(lines, elines), 500)
-
-
+       
     def run(self):
-        command = [self.python, self.manage_py, self.action]
+        import platform
+        command = [self.python, self.manage_py] + self.action
+        if platform.system() == 'Windows':
+            command = ["cmd.exe", "/k"] + command
         print command
-        if self.use_terminal:
-            self.run_and_output_to_terminal(command)
-        else:
-            self.run_and_output_to_sublime(command)
-
+        self.run_and_output_to_terminal(command)
+        

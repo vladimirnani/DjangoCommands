@@ -10,5 +10,9 @@
     {   
         "caption": "Django: Migrate Database",
         "command": "django_migrate"
+    },    
+    {   
+        "caption": "Django: Custom Command",
+        "command": "django_custom"
     }        
 ]
