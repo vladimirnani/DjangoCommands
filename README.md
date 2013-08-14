@@ -4,6 +4,7 @@ This tool is a Sublime Text 2 wrapper around django manage.py commands.
 
 With it you can run django commands like runserver, syncdb, migrate and so on from Command Palette.
 
+Currently only tested on Windows 7
 
 ## Settings
 
