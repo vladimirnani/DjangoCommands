@@ -2,7 +2,9 @@
 
 This tool is a Sublime Text wrapper around django manage.py commands. 
 
-With it you can run django commands like runserver, syncdb, migrate and so on from Command Palette.
+With it you can run django commands like runserver, syncdb, migrate from Command Palette.
+You can also run Django: Custom Command to access other manage.py commands.
+
 
 Currently only tested on Windows 7
 
