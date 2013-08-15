@@ -1,6 +1,6 @@
-# DjangoCommands for Sublime Text 2
+# DjangoCommands for ST2/ST3
 
-This tool is a Sublime Text 2 wrapper around django manage.py commands. 
+This tool is a Sublime Text wrapper around django manage.py commands. 
 
 With it you can run django commands like runserver, syncdb, migrate and so on from Command Palette.
 
@@ -8,17 +8,26 @@ Currently only tested on Windows 7
 
 ## Installation
 
-1. Clone this repo
-2. Put the contents of this repo directly inside:
+### Package Control
 
- - OS X: ~/Library/Application Support/Sublime Text 2/Packages/
- - Windows: %APPDATA%/Sublime Text 2/Packages/
- - Linux: ~/.config/sublime-text-2/Packages
+The easiest way to install this is with [Package Control](http://wbond.net/sublime\_packages/package\_control).
 
-Or use PackageControl.
+ * If you just went and installed Package Control, you probably need to restart Sublime Text before doing this next bit.
+ * Bring up the Command Palette (Command+Shift+p on OS X, Control+Shift+p on Linux/Windows).
+ * Select "Package Control: Install Package" (it'll take a few seconds)
+ * Select `Django Manage Commands` when the list appears.
+
+Package Control will automatically keep plugin up to date with the latest version.
 
 ## Settings
 
  * python_bin: path to python interpreter
  * manage_py: path to manage.py file
 
+## Use
+
+Currently supports following commands:
+- Django: Run Server
+- Django: Sync Database
+- Django: Migrate
+- Django: Custom Command
