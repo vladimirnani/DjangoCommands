@@ -21,13 +21,14 @@ Package Control will automatically keep plugin up to date with the latest versio
 
 ## Settings
 
- * python_bin: path to python interpreter
- * manage_py: path to manage.py file
+ * `python_bin`: path to python interpreter
+ * `manage_py`: path to manage.py file
+ * `python_virtualenv_paths`: list of path where virtualenvs are located
 
 ## Use
 
 Currently supports following commands:
-- Django: Run Server
-- Django: Sync Database
-- Django: Migrate
-- Django: Custom Command
+ * Django: Run Server
+ * Django: Sync Database
+ * Django: Migrate
+ * Django: Custom Command
