@@ -21,16 +21,18 @@ The easiest way to install this is with [Package Control](http://wbond.net/subli
 
 Package Control will automatically keep plugin up to date with the latest version.
 
-## Settings
-
- * `python_bin`: path to python interpreter
- * `manage_py`: path to manage.py file
- * `python_virtualenv_paths`: list of path where virtualenvs are located
-
 ## Use
 
+### Commands
 Currently supports following commands:
  * Django: Run Server
  * Django: Sync Database
  * Django: Migrate
  * Django: Custom Command
+
+### Settings
+
+ * `python_bin`: path to python interpreter
+ * `manage_py`: path to manage.py file
+ * `python_virtualenv_paths`: list of path where virtualenvs are located 
+
