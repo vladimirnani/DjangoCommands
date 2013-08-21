@@ -10,7 +10,7 @@ from functools import partial
 SETTINGS_FILE = "DjangoCommands.sublime-settings"
 
 def log(message):
-    print ' - Django: ' + message
+    print(' - Django: ' + message)
 
 def read_settings():
     settings = sublime.load_settings(SETTINGS_FILE)
@@ -68,7 +68,7 @@ class DjangoCustomCommand(DjangoCommand):
             return
         import shlex
         command_splitted = shlex.split(command)
-        print command_splitted
+        log(command_splitted)
         self.run_command(command_splitted)
 
 
@@ -84,7 +84,7 @@ class SetVirtualEnvCommand(DjangoCommand):
         return sorted(found_dirs)
 
     def _scan(self):
-        venv_paths = sublime.load_settings(SETTINGS_FILE).get("python_virtualenv_paths", [])
+        venv_paths = self.settings.get("python_virtualenv_paths", [])
         return self.scan_for_virtualenvs(venv_paths)
 
     def set_virtualenv(self, choices, index):
@@ -92,11 +92,11 @@ class SetVirtualEnvCommand(DjangoCommand):
             return
         (name, directory) = choices[index]
         log('Virtual environment "' + name + '" is set')
-        settings = sublime.load_settings(SETTINGS_FILE)
-        settings.set("python_bin", os.path.join(directory, 'python'))
+        self.settings.set("python_bin", os.path.join(directory, 'python'))        
         sublime.save_settings(SETTINGS_FILE)
 
     def run(self):
+        self.settings = sublime.load_settings(SETTINGS_FILE)
         choices = self._scan()
         nice_choices = [[path.split(os.path.sep)[-2], path] for path in choices]
         on_input = partial(self.set_virtualenv, nice_choices)
