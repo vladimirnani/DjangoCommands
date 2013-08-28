@@ -28,6 +28,7 @@ Currently supports following commands:
  * Django: Run Server
  * Django: Sync Database
  * Django: Migrate
+ * Django: Schema Migration
  * Django: Custom Command
 
 ### Settings
