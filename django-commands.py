@@ -55,6 +55,35 @@ class DjangoMigrateCommand(DjangoCommand):
     def run(self):
         self.run_command(['migrate'])
 
+class DjangoSchemaMigrationCommand(DjangoCommand):
+
+    def scan_for_apps(self):
+        found_dirs = set()        
+        for project_folder in sublime.active_window().folders():
+            folders = [x[0] for x in os.walk(project_folder)]
+            for folder in folders:
+                p = os.path.expanduser(folder)
+                pattern = os.path.join(p, "*", "models.py")
+                found_dirs.update(list(map(lambda x: x, glob.glob(pattern))))
+        return sorted(found_dirs)
+
+    def app_choose(self, choices, index):
+        if index == -1:
+            return
+        (name, directory) = choices[index]
+        self.run_command(['schemamigration', name, '--auto'])
+
+    def run(self):
+        choices = self.scan_for_apps()
+        nice_choices = [[path.split(os.path.sep)[-2], path] for path in choices]
+        on_input = partial(self.app_choose, nice_choices)
+        self.window.show_quick_panel(nice_choices, on_input)
+
+class DjangoListMigrationsCommand(DjangoCommand):
+
+    def run(self):
+        self.run_command(['migrate', '--list'])
+
 
 class DjangoCustomCommand(DjangoCommand):  
     
@@ -63,12 +92,11 @@ class DjangoCustomCommand(DjangoCommand):
                                      self.on_input, None, None)
 
     def on_input(self, command):
-        command = str(command)  # avoiding unicode
+        command = str(command)
         if command.strip() == "":        
             return
         import shlex
         command_splitted = shlex.split(command)
-        log(command_splitted)
         self.run_command(command_splitted)
 
 
