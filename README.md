@@ -29,6 +29,7 @@ Currently supports following commands:
  * Django: Sync Database
  * Django: Migrate
  * Django: Schema Migration
+ * Django: List Migrations
  * Django: Custom Command
 
 ### Settings
