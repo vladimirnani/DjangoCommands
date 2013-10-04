@@ -9,8 +9,10 @@ import os.path
 from functools import partial
 SETTINGS_FILE = "DjangoCommands.sublime-settings"
 
+
 def log(message):
     print(' - Django: ' + message)
+
 
 def read_settings():
     settings = sublime.load_settings(SETTINGS_FILE)
@@ -19,13 +21,14 @@ def read_settings():
     manage_py = find_manage_py()
     if manage_py is None:
         manage_py = settings.get('manage_py')
-    
+
     return (python_bin, manage_py)
+
 
 def find_manage_py():
     name = u'manage.py'
     for path in sublime.active_window().folders():
-        for walk in os.walk(path):    
+        for walk in os.walk(path):
             if name in walk[2]:
                 log('Found manage.py in ' + walk[0])
                 return os.path.join(walk[0], name)
@@ -33,7 +36,7 @@ def find_manage_py():
 
 class DjangoCommand(sublime_plugin.WindowCommand):
     def run_command(self, command):
-        python_bin, manage_py = read_settings()    
+        python_bin, manage_py = read_settings()
         thread = CommandThread(command, python_bin, manage_py)
         thread.start()
 
@@ -50,15 +53,28 @@ class DjangoSyncdbCommand(DjangoCommand):
         self.run_command(['syncdb'])
 
 
+class DjangoShellCommand(DjangoCommand):
+
+    def run(self):
+        self.run_command(['shell'])
+
+
+class DjangoTestCommand(DjangoCommand):
+
+    def run(self):
+        self.run_command(['test'])
+
+
 class DjangoMigrateCommand(DjangoCommand):
 
     def run(self):
         self.run_command(['migrate'])
 
+
 class DjangoSchemaMigrationCommand(DjangoCommand):
 
     def scan_for_apps(self):
-        found_dirs = set()        
+        found_dirs = set()
         for project_folder in sublime.active_window().folders():
             folders = [x[0] for x in os.walk(project_folder)]
             for folder in folders:
@@ -79,21 +95,22 @@ class DjangoSchemaMigrationCommand(DjangoCommand):
         on_input = partial(self.app_choose, nice_choices)
         self.window.show_quick_panel(nice_choices, on_input)
 
+
 class DjangoListMigrationsCommand(DjangoCommand):
 
     def run(self):
         self.run_command(['migrate', '--list'])
 
 
-class DjangoCustomCommand(DjangoCommand):  
-    
+class DjangoCustomCommand(DjangoCommand):
+
     def run(self):
         self.window.show_input_panel("Django manage.py command", "",
                                      self.on_input, None, None)
 
     def on_input(self, command):
         command = str(command)
-        if command.strip() == "":        
+        if command.strip() == "":
             return
         import shlex
         command_splitted = shlex.split(command)
@@ -120,7 +137,7 @@ class SetVirtualEnvCommand(DjangoCommand):
             return
         (name, directory) = choices[index]
         log('Virtual environment "' + name + '" is set')
-        self.settings.set("python_bin", os.path.join(directory, 'python'))        
+        self.settings.set("python_bin", os.path.join(directory, 'python'))
         sublime.save_settings(SETTINGS_FILE)
 
     def run(self):
@@ -146,4 +163,3 @@ class CommandThread(threading.Thread):
             command = ["cmd.exe", "/k"] + command
         log('Command is : ' + str(command))
         subprocess.Popen(command)
-        

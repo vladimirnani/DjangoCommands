@@ -1,30 +1,38 @@
 [
-    {   
+    {
         "caption": "Django: Run Server",
         "command": "django_run"
     },
-    {   
+    {
         "caption": "Django: Sync Database",
         "command": "django_syncdb"
-    },    
-    {   
+    },
+    {
         "caption": "Django: Migrate Database",
         "command": "django_migrate"
-    },      
-    {   
+    },
+    {
         "caption": "Django: Migrate Schema",
         "command": "django_schema_migration"
-    },      
-    {   
+    },
+    {
         "caption": "Django: List Migrations",
         "command": "django_list_migrations"
-    },     
-    {   
+    },
+    {
         "caption": "Django: Set Virtual Environment",
         "command": "set_virtual_env"
-    },    
-    {   
+    },
+    {
+        "caption": "Django: Test",
+        "command": "django_test"
+    },
+    {
+        "caption": "Django: Shell",
+        "command": "django_shell"
+    },
+    {
         "caption": "Django: Custom Command",
         "command": "django_custom"
-    }        
+    }
 ]
