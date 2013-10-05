@@ -41,34 +41,31 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         thread.start()
 
 
-class DjangoRunCommand(DjangoCommand):
+class SimpleDjangoCommand(DjangoCommand):
+    command = ''
 
     def run(self):
-        self.run_command(['runserver'])
+        self.run_command([self.command])
 
 
-class DjangoSyncdbCommand(DjangoCommand):
-
-    def run(self):
-        self.run_command(['syncdb'])
+class DjangoRunCommand(SimpleDjangoCommand):
+    command = 'runserver'
 
 
-class DjangoShellCommand(DjangoCommand):
-
-    def run(self):
-        self.run_command(['shell'])
+class DjangoSyncdbCommand(SimpleDjangoCommand):
+    command = 'syncdb'
 
 
-class DjangoTestCommand(DjangoCommand):
-
-    def run(self):
-        self.run_command(['test'])
+class DjangoShellCommand(SimpleDjangoCommand):
+    command = 'shell'
 
 
-class DjangoMigrateCommand(DjangoCommand):
+class DjangoTestCommand(SimpleDjangoCommand):
+    command = 'test'
 
-    def run(self):
-        self.run_command(['migrate'])
+
+class DjangoMigrateCommand(SimpleDjangoCommand):
+    command = 'migrate'
 
 
 class DjangoSchemaMigrationCommand(DjangoCommand):
