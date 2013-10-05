@@ -31,6 +31,8 @@ Currently supports following commands:
  * Django: Schema Migration
  * Django: List Migrations
  * Django: Custom Command
+ * Django: Test
+ * Django: Shell
 
 ### Settings
 
