@@ -158,5 +158,13 @@ class CommandThread(threading.Thread):
         command = [self.python, self.manage_py] + self.action
         if platform.system() == 'Windows':
             command = ["cmd.exe", "/k"] + command
-        log('Command is : ' + str(command))
-        subprocess.Popen(command)
+        if platform.system() == 'Linux':
+            string_command = 'bash -c \"'
+            for arg in command:
+                string_command += arg
+                string_command += ' '
+            string_command += '; read line\"'
+            command = ["gnome-terminal", "-e", string_command]
+        log('Command is : ' + str(command))  
+        subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
