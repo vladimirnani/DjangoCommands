@@ -7,7 +7,7 @@ With it you can run django commands like `Django: Run Server`, `Django: Sync Dat
 You can also run `Django: Custom Command` to access other manage.py commands. Try `Django: Help` and you will get full list of commands provided by each application.
 
 
-Currently only tested on Windows 7/8, Mac OS, Ubuntu
+Currently tested on Windows 7/8, Mac OS, Ubuntu.
 
 ## Installation
 
@@ -26,19 +26,23 @@ Package Control will automatically keep plugin up to date with the latest versio
 
 ### Commands
 Currently supports following commands:
- * Django: Run Server
- * Django: Sync Database
- * Django: Migrate
- * Django: Schema Migration
- * Django: List Migrations
- * Django: Test
- * Django: Test All
- * Django: Shell
- * Django: Set Virtual Environment
- * Django: Custom Command
- * Django: Check 
- * Django: Help
  
+#### Django:
+
+ * `Django: Run Server`
+ * `Django: Sync Database`
+ * `Django: Set Virtual Environment`
+ * `Django: Test`
+ * `Django: Test All`
+ * `Django: Shell` 
+ * `Django: Custom Command`
+ * `Django: Check`
+ * `Django: Help`
+ 
+#### South:
+ * `Django: Migrate`
+ * `Django: Schema Migration`
+ * `Django: List Migrations`
 
 ### Settings
 
