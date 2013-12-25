@@ -5,19 +5,21 @@ import subprocess
 import os
 import glob
 import os.path
-
+import platform
+import shlex
 from functools import partial
-SETTINGS_FILE = "DjangoCommands.sublime-settings"
 
+SETTINGS_FILE = 'DjangoCommands.sublime-settings'
+PLATFORM = platform.system()
 
 def log(message):
-    print(' - Django: ' + message)
+    print(' - Django: {0}'.format(message))
 
 
 def read_settings():
     settings = sublime.load_settings(SETTINGS_FILE)
     python_bin = settings.get('python_bin')
-    log('Python path is ' + python_bin)
+    log('Python path is {0}'.format(python_bin))
     manage_py = find_manage_py()
     if manage_py is None:
         manage_py = settings.get('manage_py')
@@ -29,9 +31,11 @@ def find_manage_py():
     name = u'manage.py'
     for path in sublime.active_window().folders():
         for walk in os.walk(path):
-            if name in walk[2]:
-                log('Found manage.py in ' + walk[0])
-                return os.path.join(walk[0], name)
+            files = walk[2]
+            if name in files:
+                folder = walk[0]
+                log('Found manage.py in {0}'.format(folder))
+                return os.path.join(folder, name)
 
 
 class DjangoCommand(sublime_plugin.WindowCommand):
@@ -109,7 +113,6 @@ class DjangoCustomCommand(DjangoCommand):
         command = str(command)
         if command.strip() == "":
             return
-        import shlex
         command_splitted = shlex.split(command)
         self.run_command(command_splitted)
 
@@ -117,7 +120,7 @@ class DjangoCustomCommand(DjangoCommand):
 class SetVirtualEnvCommand(DjangoCommand):
 
     def scan_for_virtualenvs(self, venv_paths):
-        bin_dir = "Scripts" if os.name == "nt" else "bin"
+        bin_dir = "Scripts" if PLATFORM == 'Windows' else "bin"
         found_dirs = set()
         for venv_path in venv_paths:
             p = os.path.expanduser(venv_path)
@@ -133,7 +136,7 @@ class SetVirtualEnvCommand(DjangoCommand):
         if index == -1:
             return
         (name, directory) = choices[index]
-        log('Virtual environment "' + name + '" is set')
+        log('Virtual environment "{0}" is set'.format(name))
         self.settings.set("python_bin", os.path.join(directory, 'python'))
         sublime.save_settings(SETTINGS_FILE)
 
@@ -154,17 +157,26 @@ class CommandThread(threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
-        import platform
         command = [self.python, self.manage_py] + self.action
-        if platform.system() == 'Windows':
-            command = ["cmd.exe", "/k"] + command
-        if platform.system() == 'Linux':
-            string_command = 'bash -c \"'
-            for arg in command:
-                string_command += arg
-                string_command += ' '
-            string_command += '; read line\"'
-            command = ["gnome-terminal", "-e", string_command]
-        log('Command is : ' + str(command))  
-        subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        command = ' '.join(command)
 
+        if PLATFORM == 'Windows':
+            command = [
+                'cmd.exe',
+                '/k', command
+            ]
+        if PLATFORM == 'Linux':
+            command = [
+                'gnome-terminal',
+                '-e', 'bash -c \"{0}; read line\"'.format(command)
+            ]
+        if PLATFORM == 'Darwin':
+            command = [
+                'osascript',
+                '-e', 'tell app "Terminal" to activate',
+                '-e', 'tell application "System Events" to tell process "Terminal" to keystroke "t" using command down',
+                '-e', 'tell application "Terminal" to do script "{0}" in front window'.format(command)
+            ]
+
+        log('Command is : {0}'.format(str(command)))
+        subprocess.Popen(command, shell=False)
