@@ -1,12 +1,12 @@
 # DjangoCommands for ST2/ST3
 
-This tool is a Sublime Text wrapper around django manage.py commands. 
+This tool is a Sublime Text wrapper around django `manage.py` commands. 
 
 With it you can run django commands like runserver, syncdb, migrate from Command Palette.
-You can also run Django: Custom Command to access other manage.py commands.
+You can also run `Django: Custom Command` to access other manage.py commands.
 
 
-Currently only tested on Windows 7
+Currently only tested on Windows 7/8, Mac OS, Ubuntu
 
 ## Installation
 
@@ -30,9 +30,14 @@ Currently supports following commands:
  * Django: Migrate
  * Django: Schema Migration
  * Django: List Migrations
- * Django: Custom Command
  * Django: Test
+ * Django: Test All
  * Django: Shell
+ * Django: Set Virtual Environment
+ * Django: Custom Command
+ * Django: Check 
+ * Django: Help
+ 
 
 ### Settings
 
