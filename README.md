@@ -2,8 +2,9 @@
 
 This tool is a Sublime Text wrapper around django `manage.py` commands. 
 
-With it you can run django commands like runserver, syncdb, migrate from Command Palette.
-You can also run `Django: Custom Command` to access other manage.py commands.
+With it you can run django commands like `Django: Run Server`, `Django: Sync Database`, `Django: Migrate` from Command Palette.
+
+You can also run `Django: Custom Command` to access other manage.py commands. Try `Django: Help` and you will get full list of commands provided by each application.
 
 
 Currently only tested on Windows 7/8, Mac OS, Ubuntu
@@ -42,6 +43,6 @@ Currently supports following commands:
 ### Settings
 
  * `python_bin`: path to python interpreter
- * `manage_py`: path to manage.py file
- * `python_virtualenv_paths`: list of path where virtualenvs are located 
+ * `manage_py`: path to `manage.py` file
+ * `python_virtualenv_paths`: list of paths where virtualenvs are located (ex:`~/.virtualenvs/`)
 
