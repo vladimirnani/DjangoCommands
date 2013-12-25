@@ -16,17 +16,6 @@ def log(message):
     print(' - Django: {0}'.format(message))
 
 
-def read_settings():
-    settings = sublime.load_settings(SETTINGS_FILE)
-    python_bin = settings.get('python_bin')
-    log('Python path is {0}'.format(python_bin))
-    manage_py = find_manage_py()
-    if manage_py is None:
-        manage_py = settings.get('manage_py')
-
-    return (python_bin, manage_py)
-
-
 def find_manage_py():
     name = u'manage.py'
     for path in sublime.active_window().folders():
@@ -39,8 +28,16 @@ def find_manage_py():
 
 
 class DjangoCommand(sublime_plugin.WindowCommand):
+    settings = sublime.load_settings(SETTINGS_FILE)
+
+    def read_settings(self):
+        python_bin = self.settings.get('python_bin')
+        log('Python path is ' + python_bin)
+        manage_py = find_manage_py() or self.settings.get('manage_py')
+        return (python_bin, manage_py)
+
     def run_command(self, command):
-        python_bin, manage_py = read_settings()
+        python_bin, manage_py = self.read_settings()
         thread = CommandThread(command, python_bin, manage_py)
         thread.start()
 
@@ -52,27 +49,9 @@ class SimpleDjangoCommand(DjangoCommand):
         self.run_command([self.command])
 
 
-class DjangoRunCommand(SimpleDjangoCommand):
-    command = 'runserver'
-
-
-class DjangoSyncdbCommand(SimpleDjangoCommand):
-    command = 'syncdb'
-
-
-class DjangoShellCommand(SimpleDjangoCommand):
-    command = 'shell'
-
-
-class DjangoTestCommand(SimpleDjangoCommand):
-    command = 'test'
-
-
-class DjangoMigrateCommand(SimpleDjangoCommand):
-    command = 'migrate'
-
-
-class DjangoSchemaMigrationCommand(DjangoCommand):
+class DjangoAppCommand(DjangoCommand):
+    command = ''
+    extra_args = []
 
     def scan_for_apps(self):
         found_dirs = set()
@@ -88,13 +67,51 @@ class DjangoSchemaMigrationCommand(DjangoCommand):
         if index == -1:
             return
         (name, directory) = choices[index]
-        self.run_command(['schemamigration', name, '--auto'])
+        self.run_command([self.command, name] + self.extra_args)
 
     def run(self):
         choices = self.scan_for_apps()
         nice_choices = [[path.split(os.path.sep)[-2], path] for path in choices]
         on_input = partial(self.app_choose, nice_choices)
         self.window.show_quick_panel(nice_choices, on_input)
+
+
+
+class DjangoRunCommand(SimpleDjangoCommand):
+    command = 'runserver'
+
+
+class DjangoSyncdbCommand(SimpleDjangoCommand):
+    command = 'syncdb'
+
+
+class DjangoShellCommand(SimpleDjangoCommand):
+    command = 'shell'
+
+
+class DjangoCheckCommand(SimpleDjangoCommand):
+    command = 'check'
+
+
+class DjangoHelpCommand(SimpleDjangoCommand):
+    command = 'help'
+
+
+class DjangoMigrateCommand(SimpleDjangoCommand):
+    command = 'migrate'
+
+
+class DjangoSchemaMigrationCommand(DjangoAppCommand):
+    command = 'schemamigration'
+    extra_args = ['--auto']
+
+
+class DjangoTestAllCommand(SimpleDjangoCommand):
+    command = 'test'
+
+
+class DjangoTestAppCommand(DjangoAppCommand):
+    command = 'test'
 
 
 class DjangoListMigrationsCommand(DjangoCommand):
@@ -120,11 +137,11 @@ class DjangoCustomCommand(DjangoCommand):
 class SetVirtualEnvCommand(DjangoCommand):
 
     def scan_for_virtualenvs(self, venv_paths):
-        bin_dir = "Scripts" if PLATFORM == 'Windows' else "bin"
+        bin = "Scripts" if PLATFORM == 'Windows' else "bin"
         found_dirs = set()
-        for venv_path in venv_paths:
-            p = os.path.expanduser(venv_path)
-            pattern = os.path.join(p, "*", bin_dir, "activate_this.py")
+        for path in venv_paths:
+            p = os.path.expanduser(path)
+            pattern = os.path.join(p, "*", bin, "activate_this.py")
             found_dirs.update(list(map(os.path.dirname, glob.glob(pattern))))
         return sorted(found_dirs)
 
@@ -141,8 +158,8 @@ class SetVirtualEnvCommand(DjangoCommand):
         sublime.save_settings(SETTINGS_FILE)
 
     def run(self):
-        self.settings = sublime.load_settings(SETTINGS_FILE)
-        choices = self._scan()
+        venv_paths = self.settings.get("python_virtualenv_paths", [])
+        choices = self.scan_for_virtualenvs(venv_paths)
         nice_choices = [[path.split(os.path.sep)[-2], path] for path in choices]
         on_input = partial(self.set_virtualenv, nice_choices)
         self.window.show_quick_panel(nice_choices, on_input)

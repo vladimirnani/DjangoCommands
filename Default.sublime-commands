@@ -28,8 +28,20 @@
         "command": "django_test"
     },
     {
+        "caption": "Django: Test All",
+        "command": "django_test_all"
+    },
+    {
         "caption": "Django: Shell",
         "command": "django_shell"
+    },
+    {
+        "caption": "Django: Help",
+        "command": "django_help"
+    },
+    {
+        "caption": "Django: Check",
+        "command": "django_check"
     },
     {
         "caption": "Django: Custom Command",
