@@ -1,12 +1,13 @@
 # DjangoCommands for ST2/ST3
 
-This tool is a Sublime Text wrapper around django manage.py commands. 
+This tool is a Sublime Text wrapper around django `manage.py` commands. 
 
-With it you can run django commands like runserver, syncdb, migrate from Command Palette.
-You can also run Django: Custom Command to access other manage.py commands.
+With it you can run django commands like `Django: Run Server`, `Django: Sync Database`, `Django: Migrate` from Command Palette.
+
+You can also run `Django: Custom Command` to access other manage.py commands. Try `Django: Help` and you will get full list of commands provided by each application.
 
 
-Currently only tested on Windows 7
+Currently tested on Windows 7/8, Mac OS, Ubuntu.
 
 ## Installation
 
@@ -25,18 +26,27 @@ Package Control will automatically keep plugin up to date with the latest versio
 
 ### Commands
 Currently supports following commands:
- * Django: Run Server
- * Django: Sync Database
- * Django: Migrate
- * Django: Schema Migration
- * Django: List Migrations
- * Django: Custom Command
- * Django: Test
- * Django: Shell
+ 
+#### Django:
+
+ * `Django: Run Server`
+ * `Django: Sync Database`
+ * `Django: Set Virtual Environment`
+ * `Django: Test`
+ * `Django: Test All`
+ * `Django: Shell` 
+ * `Django: Custom Command`
+ * `Django: Check`
+ * `Django: Help`
+ 
+#### South:
+ * `Django: Migrate`
+ * `Django: Schema Migration`
+ * `Django: List Migrations`
 
 ### Settings
 
  * `python_bin`: path to python interpreter
- * `manage_py`: path to manage.py file
- * `python_virtualenv_paths`: list of path where virtualenvs are located 
+ * `manage_py`: path to `manage.py` file
+ * `python_virtualenv_paths`: list of paths where virtualenvs are located (ex:`~/.virtualenvs/`)
 
