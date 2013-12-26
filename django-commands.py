@@ -32,7 +32,7 @@ class DjangoCommand(sublime_plugin.WindowCommand):
 
     def read_settings(self):
         python_bin = self.settings.get('python_bin')
-        log('Python path is ' + python_bin)
+        log('Python path is {0}'.format(python_bin))
         manage_py = find_manage_py() or self.settings.get('manage_py')
         return (python_bin, manage_py)
 
