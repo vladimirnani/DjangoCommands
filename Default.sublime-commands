@@ -24,6 +24,10 @@
         "command": "set_virtual_env"
     },
     {
+        "caption": "Django: Terminal Here",
+        "command": "terminal_here"
+    },
+    {
         "caption": "Django: Test",
         "command": "django_test_app"
     },

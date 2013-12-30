@@ -30,7 +30,7 @@ class DjangoCommand(sublime_plugin.WindowCommand):
 
     def prettify(self, app_dir, base_dir):
         name = app_dir.replace(base_dir, '')
-        name = name.replace('models.py', '')
+        name = name.replace(self.app_descriptor, '')
         name = name[1:-1]
         name = name.replace(os.path.sep, '.')
         return name
@@ -48,21 +48,20 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         base_dir = os.path.abspath(os.path.join(manage_py, os.pardir))
         os.chdir(base_dir)
 
-        thread = CommandThread(command, bin, manage_py)
+        command = [self.bin, manage_py] + self.action
+
+        thread = CommandThread(command)
         thread.start()
 
 
 class CommandThread(threading.Thread):
 
-    def __init__(self, action, python, manage_py):
-        self.python = python
-        self.manage_py = manage_py
-        self.action = action
+    def __init__(self, command):
+        self.command = command
         threading.Thread.__init__(self)
 
     def run(self):
-        command = [self.python, self.manage_py] + self.action
-        command = ' '.join(command)
+        command = ' '.join(self.command)
 
         if PLATFORM == 'Windows':
             command = [
@@ -96,6 +95,7 @@ class SimpleDjangoCommand(DjangoCommand):
 class DjangoAppCommand(DjangoCommand):
     command = ''
     extra_args = []
+    app_descriptor = 'models.py'
 
     def find_apps(self):
         apps = set()
@@ -103,7 +103,7 @@ class DjangoAppCommand(DjangoCommand):
             dirs = [x[0] for x in os.walk(project_folder)]
             for dir in dirs:
                 dir = os.path.expanduser(dir)
-                pattern = os.path.join(dir, "*", "models.py")
+                pattern = os.path.join(dir, "*", self.app_descriptor)
                 apps.update(list(map(lambda x: x, glob.glob(pattern))))
         return sorted(apps)
 
@@ -148,7 +148,7 @@ class DjangoTestAllCommand(SimpleDjangoCommand):
 
 class DjangoTestAppCommand(DjangoAppCommand):
     command = 'test'
-    use_apps_dir = True
+    app_descriptor = 'tests.py'
 
 
 class DjangoSchemaMigrationCommand(DjangoAppCommand):
@@ -174,6 +174,21 @@ class DjangoCustomCommand(DjangoCommand):
             return
         command_splitted = shlex.split(command)
         self.run_command(command_splitted)
+
+
+class TerminalHereCommand(DjangoCommand):
+
+    def run(self):
+        bin = self.settings.get('python_bin')
+        manage_py = self.settings.get('manage_py') or self.find_manage_py()
+
+        base_dir = os.path.abspath(os.path.join(manage_py, os.pardir))
+        os.chdir(base_dir)
+
+        command = [os.path.join(os.path.dirname(bin), 'activate')]
+
+        thread = CommandThread(command)
+        thread.start()
 
 
 class SetVirtualEnvCommand(DjangoCommand):

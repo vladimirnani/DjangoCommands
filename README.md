@@ -1,6 +1,6 @@
 # DjangoCommands for ST2/ST3
 
-This tool is a Sublime Text wrapper around django `manage.py` commands. 
+This tool is a Sublime Text wrapper around django `manage.py` commands.
 
 With it you can run django commands like `Django: Run Server`, `Django: Sync Database`, `Django: Migrate` from Command Palette.
 
@@ -26,19 +26,18 @@ Package Control will automatically keep plugin up to date with the latest versio
 
 ### Commands
 Currently supports following commands:
- 
+
 #### Django:
 
  * `Django: Run Server`
  * `Django: Sync Database`
- * `Django: Set Virtual Environment`
  * `Django: Test`
  * `Django: Test All`
- * `Django: Shell` 
+ * `Django: Shell`
  * `Django: Custom Command`
  * `Django: Check`
  * `Django: Help`
- 
+
 #### South:
  * `Django: Migrate`
  * `Django: Schema Migration`
@@ -50,3 +49,6 @@ Currently supports following commands:
  * `manage_py`: path to `manage.py` file
  * `python_virtualenv_paths`: list of paths where virtualenvs are located (ex:`~/.virtualenvs/`)
 
+#### Virtual Environment:
+ * `Django: Set Virtual Environment`
+ * `Django: Terminal Here`
