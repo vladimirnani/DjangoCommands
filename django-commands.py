@@ -19,8 +19,6 @@ class DjangoCommand(sublime_plugin.WindowCommand):
 
     def __init__(self, *args, **kwargs):
         self.settings = sublime.load_settings(SETTINGS_FILE)
-        self.python_bin = self.settings.get('python_bin')
-        self.manage_py = self.settings.get('manage_py') or self.find_manage_py()
         sublime_plugin.WindowCommand.__init__(self, *args, **kwargs)
 
 
@@ -30,13 +28,27 @@ class DjangoCommand(sublime_plugin.WindowCommand):
                 if 'manage.py' in files:
                     return os.path.join(root, 'manage.py')
 
+    def prettify(self, app_dir, base_dir):
+        name = app_dir.replace(base_dir, '')
+        name = name.replace('models.py', '')
+        name = name[1:-1]
+        name = name.replace(os.path.sep, '.')
+        return name
+
     def choose(self, choices, action):
-        nice_choices = [[path.split(os.path.sep)[-2], path] for path in choices]
+        base_dir = os.path.dirname(self.find_manage_py())
+        nice_choices = [self.prettify(path, base_dir) for path in choices]
         on_input = partial(action, nice_choices)
         self.window.show_quick_panel(nice_choices, on_input)
 
     def run_command(self, command):
-        thread = CommandThread(command, self.python_bin, self.manage_py)
+        bin = self.settings.get('python_bin')
+        manage_py = self.settings.get('manage_py') or self.find_manage_py()
+
+        base_dir = os.path.abspath(os.path.join(manage_py, os.pardir))
+        os.chdir(base_dir)
+
+        thread = CommandThread(command, bin, manage_py)
         thread.start()
 
 
@@ -98,7 +110,7 @@ class DjangoAppCommand(DjangoCommand):
     def choose_app(self, apps, index):
         if index == -1:
             return
-        name, directory = apps[index]
+        name = apps[index]
         self.run_command([self.command, name] + self.extra_args)
 
     def run(self):
@@ -136,6 +148,7 @@ class DjangoTestAllCommand(SimpleDjangoCommand):
 
 class DjangoTestAppCommand(DjangoAppCommand):
     command = 'test'
+    use_apps_dir = True
 
 
 class DjangoSchemaMigrationCommand(DjangoAppCommand):
@@ -155,6 +168,7 @@ class DjangoCustomCommand(DjangoCommand):
                                      "", self.on_input, None, None)
 
     def on_input(self, command):
+        log(str(command))
         command = str(command)
         if command.strip() == "":
             return
