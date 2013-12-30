@@ -28,6 +28,10 @@
         "command": "terminal_here"
     },
     {
+        "caption": "Django: Pip Freeze",
+        "command": "pip_freeze"
+    },
+    {
         "caption": "Django: Test",
         "command": "django_test_app"
     },

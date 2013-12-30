@@ -39,16 +39,16 @@ Currently supports following commands:
  * `Django: Help`
 
 #### South:
- * `Django: Migrate`
+ * `Django: Migrate Database`
  * `Django: Schema Migration`
  * `Django: List Migrations`
 
 ### Settings
 
  * `python_bin`: path to python interpreter
- * `manage_py`: path to `manage.py` file
  * `python_virtualenv_paths`: list of paths where virtualenvs are located (ex:`~/.virtualenvs/`)
 
 #### Virtual Environment:
  * `Django: Set Virtual Environment`
  * `Django: Terminal Here`
+ * `Django: Pip Freeze`

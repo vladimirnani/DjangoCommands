@@ -182,19 +182,27 @@ class DjangoCustomCommand(DjangoCommand):
 
 
 class VirtualEnvCommand(DjangoCommand):
+    command = ''
+    extra_args = []
 
     def is_enabled(self):
         return self.settings.get('python_bin') is not None
 
-
-class TerminalHereCommand(VirtualEnvCommand):
-
     def run(self):
         self.go_to_project_home()
-        bin = self.settings.get('python_bin')
-        command = os.path.join(os.path.dirname(bin), 'activate')
-        thread = CommandThread([command])
+        bin_dir = os.path.dirname(self.settings.get('python_bin'))
+        command = [os.path.join(bin_dir, self.command)] + self.extra_args
+        thread = CommandThread(command)
         thread.start()
+
+
+class TerminalHereCommand(VirtualEnvCommand):
+    command = 'activate'
+
+
+class PipFreezeCommand(VirtualEnvCommand):
+    command = 'pip'
+    extra_args = ['freeze']
 
 
 class SetVirtualEnvCommand(VirtualEnvCommand):
