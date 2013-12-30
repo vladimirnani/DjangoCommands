@@ -3,9 +3,6 @@
     // It is being overriden when set_virutal_env command is invoked.
     "python_bin": null,
 
-    // Path to Django management script anage.py
-    "manage_py": null,
-
     // List of paths where to find virtual environments
     "python_virtualenv_paths": [
         "~\\.virtualenvs",  // virtualenvwrapper

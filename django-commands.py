@@ -21,32 +21,28 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         self.settings = sublime.load_settings(SETTINGS_FILE)
         sublime_plugin.WindowCommand.__init__(self, *args, **kwargs)
 
-
-    def find_manage_py(self):
+    def get_manage_py(self):
         for path in sublime.active_window().folders():
             for root, dirs, files in os.walk(path):
                 if 'manage.py' in files:
                     return os.path.join(root, 'manage.py')
 
-    def prettify(self, app_dir, base_dir):
-        name = app_dir.replace(base_dir, '')
-        name = name.replace(self.app_descriptor, '')
-        name = name[1:-1]
-        name = name.replace(os.path.sep, '.')
-        return name
-
     def choose(self, choices, action):
-        base_dir = os.path.dirname(self.find_manage_py())
-        nice_choices = [self.prettify(path, base_dir) for path in choices]
-        on_input = partial(action, nice_choices)
-        self.window.show_quick_panel(nice_choices, on_input)
+        on_input = partial(action, choices)
+        self.window.show_quick_panel(choices, on_input)
+
+    def go_to_project_home(self, manage_py=None):
+        manage_py = manage_py or self.get_manage_py()
+        base_dir = os.path.abspath(os.path.join(manage_py, os.pardir))
+        os.chdir(base_dir)
+
+    def is_enabled(self):
+        return self.get_manage_py() is not None
 
     def run_command(self, command):
         bin = self.settings.get('python_bin')
-        manage_py = self.settings.get('manage_py') or self.find_manage_py()
-
-        base_dir = os.path.abspath(os.path.join(manage_py, os.pardir))
-        os.chdir(base_dir)
+        manage_py = self.get_manage_py()
+        self.go_to_project_home()
 
         command = [bin, manage_py] + command
 
@@ -85,7 +81,7 @@ class CommandThread(threading.Thread):
         subprocess.Popen(command, shell=False)
 
 
-class SimpleDjangoCommand(DjangoCommand):
+class DjangoSimpleCommand(DjangoCommand):
     command = ''
 
     def run(self):
@@ -107,42 +103,52 @@ class DjangoAppCommand(DjangoCommand):
                 apps.update(list(map(lambda x: x, glob.glob(pattern))))
         return sorted(apps)
 
-    def choose_app(self, apps, index):
+    def prettify(self, app_dir, base_dir):
+        name = app_dir.replace(base_dir, '')
+        name = name.replace(self.app_descriptor, '')
+        name = name[1:-1]
+        name = name.replace(os.path.sep, '.')
+        return name
+
+    def on_choose_app(self, apps, index):
         if index == -1:
             return
         name = apps[index]
         self.run_command([self.command, name] + self.extra_args)
 
     def run(self):
+        self.go_to_project_home()
         choices = self.find_apps()
-        self.choose(choices, self.choose_app)
+        base_dir = os.path.dirname(self.get_manage_py())
+        choices = [self.prettify(path, base_dir) for path in choices]
+        self.choose(choices, self.on_choose_app)
 
 
-class DjangoRunCommand(SimpleDjangoCommand):
+class DjangoRunCommand(DjangoSimpleCommand):
     command = 'runserver'
 
 
-class DjangoSyncdbCommand(SimpleDjangoCommand):
+class DjangoSyncdbCommand(DjangoSimpleCommand):
     command = 'syncdb'
 
 
-class DjangoShellCommand(SimpleDjangoCommand):
+class DjangoShellCommand(DjangoSimpleCommand):
     command = 'shell'
 
 
-class DjangoCheckCommand(SimpleDjangoCommand):
+class DjangoCheckCommand(DjangoSimpleCommand):
     command = 'check'
 
 
-class DjangoHelpCommand(SimpleDjangoCommand):
+class DjangoHelpCommand(DjangoSimpleCommand):
     command = 'help'
 
 
-class DjangoMigrateCommand(SimpleDjangoCommand):
+class DjangoMigrateCommand(DjangoSimpleCommand):
     command = 'migrate'
 
 
-class DjangoTestAllCommand(SimpleDjangoCommand):
+class DjangoTestAllCommand(DjangoSimpleCommand):
     command = 'test'
 
 
@@ -156,7 +162,7 @@ class DjangoSchemaMigrationCommand(DjangoAppCommand):
     extra_args = ['--auto']
 
 
-class DjangoListMigrationsCommand(SimpleDjangoCommand):
+class DjangoListMigrationsCommand(DjangoSimpleCommand):
     command = 'migrate'
     extra_args = ['--list']
 
@@ -164,34 +170,37 @@ class DjangoListMigrationsCommand(SimpleDjangoCommand):
 class DjangoCustomCommand(DjangoCommand):
 
     def run(self):
-        self.window.show_input_panel("Django manage.py command",
-                                     "", self.on_input, None, None)
+        caption = "Django manage.py command"
+        self.window.show_input_panel(caption,'', self.on_done, None, None)
 
-    def on_input(self, command):
-        log(str(command))
-        command = str(command)
-        if command.strip() == "":
+    def on_done(self, command):
+        command = command
+        if command.strip() == '':
             return
-        command_splitted = shlex.split(command)
-        self.run_command(command_splitted)
+        command = shlex.split(command)
+        self.run_command(command)
 
 
-class TerminalHereCommand(DjangoCommand):
+class VirtualEnvCommand(DjangoCommand):
+
+    def is_enabled(self):
+        return self.settings.get('python_bin') is not None
+
+
+class TerminalHereCommand(VirtualEnvCommand):
 
     def run(self):
+        self.go_to_project_home()
         bin = self.settings.get('python_bin')
-        manage_py = self.settings.get('manage_py') or self.find_manage_py()
-
-        base_dir = os.path.abspath(os.path.join(manage_py, os.pardir))
-        os.chdir(base_dir)
-
-        command = [os.path.join(os.path.dirname(bin), 'activate')]
-
-        thread = CommandThread(command)
+        command = os.path.join(os.path.dirname(bin), 'activate')
+        thread = CommandThread([command])
         thread.start()
 
 
-class SetVirtualEnvCommand(DjangoCommand):
+class SetVirtualEnvCommand(VirtualEnvCommand):
+
+    def is_enabled(self):
+        return True
 
     def find_virtualenvs(self, venv_paths):
         bin = "Scripts" if PLATFORM == 'Windows' else "bin"
@@ -207,11 +216,12 @@ class SetVirtualEnvCommand(DjangoCommand):
             return
         name, directory = venvs[index]
         log('Virtual environment "{0}" is set'.format(name))
-        interpreter = os.path.join(directory, 'python')
-        self.settings.set("python_bin", interpreter)
+        bin = os.path.join(directory, 'python')
+        self.settings.set("python_bin", bin)
         sublime.save_settings(SETTINGS_FILE)
 
     def run(self):
         venv_paths = self.settings.get("python_virtualenv_paths", [])
         choices = self.find_virtualenvs(venv_paths)
+        choices = [[path.split(os.path.sep)[-2], path] for path in choices]
         self.choose(choices, self.set_virtualenv)
