@@ -48,7 +48,7 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         base_dir = os.path.abspath(os.path.join(manage_py, os.pardir))
         os.chdir(base_dir)
 
-        command = [self.bin, manage_py] + self.action
+        command = [bin, manage_py] + command
 
         thread = CommandThread(command)
         thread.start()
