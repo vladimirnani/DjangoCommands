@@ -33,6 +33,8 @@ class DjangoCommand(sublime_plugin.WindowCommand):
 
     def go_to_project_home(self, manage_py=None):
         manage_py = manage_py or self.get_manage_py()
+        if manage_py is None:
+            return
         base_dir = os.path.abspath(os.path.join(manage_py, os.pardir))
         os.chdir(base_dir)
 
@@ -171,7 +173,7 @@ class DjangoCustomCommand(DjangoCommand):
 
     def run(self):
         caption = "Django manage.py command"
-        self.window.show_input_panel(caption,'', self.on_done, None, None)
+        self.window.show_input_panel(caption, '', self.on_done, None, None)
 
     def on_done(self, command):
         command = command
