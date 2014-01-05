@@ -17,36 +17,37 @@ def log(message):
 
 class DjangoCommand(sublime_plugin.WindowCommand):
 
-    def __init__(self, *args, **kwargs):
-        self.settings = sublime.load_settings(SETTINGS_FILE)
-        sublime_plugin.WindowCommand.__init__(self, *args, **kwargs)
-
-    def get_manage_py(self):
+    def get_manage_py():
         for path in sublime.active_window().folders():
             for root, dirs, files in os.walk(path):
                 if 'manage.py' in files:
                     return os.path.join(root, 'manage.py')
 
+    manage_py = get_manage_py()
+
+    def __init__(self, *args, **kwargs):
+        self.settings = sublime.load_settings(SETTINGS_FILE)
+        sublime_plugin.WindowCommand.__init__(self, *args, **kwargs)
+
+
     def choose(self, choices, action):
         on_input = partial(action, choices)
         self.window.show_quick_panel(choices, on_input)
 
-    def go_to_project_home(self, manage_py=None):
-        manage_py = manage_py or self.get_manage_py()
-        if manage_py is None:
+    def go_to_project_home(self):
+        if self.manage_py is None:
             return
-        base_dir = os.path.abspath(os.path.join(manage_py, os.pardir))
+        base_dir = os.path.abspath(os.path.join(self.manage_py, os.pardir))
         os.chdir(base_dir)
 
     def is_enabled(self):
-        return self.get_manage_py() is not None
+        return self.manage_py is not None
 
     def run_command(self, command):
         bin = self.settings.get('python_bin')
-        manage_py = self.get_manage_py()
         self.go_to_project_home()
 
-        command = [bin, manage_py] + command
+        command = [bin, self.manage_py] + command
 
         thread = CommandThread(command)
         thread.start()
@@ -121,7 +122,7 @@ class DjangoAppCommand(DjangoCommand):
     def run(self):
         self.go_to_project_home()
         choices = self.find_apps()
-        base_dir = os.path.dirname(self.get_manage_py())
+        base_dir = os.path.dirname(self.manage_py)
         choices = [self.prettify(path, base_dir) for path in choices]
         self.choose(choices, self.on_choose_app)
 
