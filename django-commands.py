@@ -17,13 +17,11 @@ def log(message):
 
 class DjangoCommand(sublime_plugin.WindowCommand):
 
-    def get_manage_py():
+    def get_manage_py(self):
         for path in sublime.active_window().folders():
             for root, dirs, files in os.walk(path):
                 if 'manage.py' in files:
                     return os.path.join(root, 'manage.py')
-
-    manage_py = get_manage_py()
 
     def __init__(self, *args, **kwargs):
         self.settings = sublime.load_settings(SETTINGS_FILE)
@@ -40,11 +38,12 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         base_dir = os.path.abspath(os.path.join(self.manage_py, os.pardir))
         os.chdir(base_dir)
 
-    def is_enabled(self):
-        return self.manage_py is not None
+    # def is_enabled(self):
+    #     return self.manage_py is not None
 
     def run_command(self, command):
         bin = self.settings.get('python_bin')
+        self.manage_py = self.get_manage_py()
         self.go_to_project_home()
 
         command = [bin, self.manage_py] + command
@@ -120,6 +119,7 @@ class DjangoAppCommand(DjangoCommand):
         self.run_command([self.command, name] + self.extra_args)
 
     def run(self):
+
         self.go_to_project_home()
         choices = self.find_apps()
         base_dir = os.path.dirname(self.manage_py)
@@ -192,6 +192,7 @@ class VirtualEnvCommand(DjangoCommand):
         return self.settings.get('python_bin') is not None
 
     def run(self):
+        self.manage_py = self.get_manage_py()
         self.go_to_project_home()
         bin_dir = os.path.dirname(self.settings.get('python_bin'))
         command = [os.path.join(bin_dir, self.command)] + self.extra_args
