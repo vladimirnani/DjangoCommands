@@ -17,16 +17,18 @@ def log(message):
 
 class DjangoCommand(sublime_plugin.WindowCommand):
 
-    def get_manage_py(self):
-        for path in sublime.active_window().folders():
-            for root, dirs, files in os.walk(path):
-                if 'manage.py' in files:
-                    return os.path.join(root, 'manage.py')
-
     def __init__(self, *args, **kwargs):
         self.settings = sublime.load_settings(SETTINGS_FILE)
         sublime_plugin.WindowCommand.__init__(self, *args, **kwargs)
 
+    def get_manage_py(self):
+        return self.settings.get('django_project_root') or self.find_manage_py()
+
+    def find_manage_py(self):
+        for path in sublime.active_window().folders():
+            for root, dirs, files in os.walk(path):
+                if 'manage.py' in files:
+                    return os.path.join(root, 'manage.py')
 
     def choose(self, choices, action):
         on_input = partial(action, choices)
@@ -37,9 +39,6 @@ class DjangoCommand(sublime_plugin.WindowCommand):
             return
         base_dir = os.path.abspath(os.path.join(self.manage_py, os.pardir))
         os.chdir(base_dir)
-
-    # def is_enabled(self):
-    #     return self.manage_py is not None
 
     def run_command(self, command):
         bin = self.settings.get('python_bin')

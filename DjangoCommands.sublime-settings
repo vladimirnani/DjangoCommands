@@ -2,7 +2,8 @@
     // Path to python interpreter
     // It is being overriden when set_virutal_env command is invoked.
     "python_bin": null,
-
+    // Force finding manage.py in this directory
+    "django_project_root" : null,
     // List of paths where to find virtual environments
     "python_virtualenv_paths": [
         "~\\.virtualenvs",  // virtualenvwrapper
