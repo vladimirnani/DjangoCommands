@@ -41,12 +41,13 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         os.chdir(base_dir)
 
     def run_command(self, command):
-        bin = self.settings.get('python_bin')
+        binary = self.settings.get('python_bin')
         self.manage_py = self.get_manage_py()
         self.go_to_project_home()
 
-        command = [bin, self.manage_py] + command
-
+        #Old way command = [self.manage_py] + command
+        command = "{} {}".format(self.manage_py,command)
+        print(command)
         thread = CommandThread(command)
         thread.start()
 
@@ -58,7 +59,7 @@ class CommandThread(threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
-        command = ' '.join(self.command)
+        command = "{}".format(self.command)
 
         if PLATFORM == 'Windows':
             command = [
@@ -86,7 +87,7 @@ class DjangoSimpleCommand(DjangoCommand):
     command = ''
 
     def run(self):
-        self.run_command([self.command])
+        self.run_command(self.command)
 
 
 class DjangoAppCommand(DjangoCommand):
@@ -214,7 +215,7 @@ class SetVirtualEnvCommand(VirtualEnvCommand):
         return True
 
     def find_virtualenvs(self, venv_paths):
-        bin = "Scripts" if PLATFORM == 'Windows' else "bin"
+        bin  = "Scripts" if PLATFORM == 'Windows' else "bin"
         venvs = set()
         for path in venv_paths:
             path = os.path.expanduser(path)
