@@ -6,6 +6,7 @@ import os
 import glob
 import platform
 import shlex
+import shutil
 from functools import partial
 
 SETTINGS_FILE = 'DjangoCommands.sublime-settings'
@@ -24,6 +25,9 @@ class DjangoCommand(sublime_plugin.WindowCommand):
     def get_manage_py(self):
         return self.settings.get('django_project_root') or self.find_manage_py()
 
+    def get_executable(self):
+        return shutil.which('python')
+
     def find_manage_py(self):
         for path in sublime.active_window().folders():
             for root, dirs, files in os.walk(path):
@@ -41,12 +45,13 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         os.chdir(base_dir)
 
     def run_command(self, command):
-        bin = self.settings.get('python_bin')
+        binary = self.settings.get('python_bin')
+        if binary is None:
+            binary = self.get_executable()
         self.manage_py = self.get_manage_py()
         self.go_to_project_home()
 
-        command = [bin, self.manage_py] + command
-
+        command = "{} {} {}".format(binary,self.manage_py,command)
         thread = CommandThread(command)
         thread.start()
 
@@ -58,7 +63,7 @@ class CommandThread(threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
-        command = ' '.join(self.command)
+        command = "{}".format(self.command)
 
         if PLATFORM == 'Windows':
             command = [
@@ -86,7 +91,7 @@ class DjangoSimpleCommand(DjangoCommand):
     command = ''
 
     def run(self):
-        self.run_command([self.command])
+        self.run_command(self.command)
 
 
 class DjangoAppCommand(DjangoCommand):
@@ -214,11 +219,11 @@ class SetVirtualEnvCommand(VirtualEnvCommand):
         return True
 
     def find_virtualenvs(self, venv_paths):
-        bin = "Scripts" if PLATFORM == 'Windows' else "bin"
+        binary = "Scripts" if PLATFORM == 'Windows' else "bin"
         venvs = set()
         for path in venv_paths:
             path = os.path.expanduser(path)
-            pattern = os.path.join(path, "*", bin, "activate_this.py")
+            pattern = os.path.join(path, "*", binary, "activate_this.py")
             venvs.update(list(map(os.path.dirname, glob.glob(pattern))))
         return sorted(venvs)
 
@@ -227,8 +232,8 @@ class SetVirtualEnvCommand(VirtualEnvCommand):
             return
         name, directory = venvs[index]
         log('Virtual environment "{0}" is set'.format(name))
-        bin = os.path.join(directory, 'python')
-        self.settings.set("python_bin", bin)
+        binary = os.path.join(directory, 'python')
+        self.settings.set("python_bin", binary)
         sublime.save_settings(SETTINGS_FILE)
 
     def run(self):
