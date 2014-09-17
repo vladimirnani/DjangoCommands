@@ -45,9 +45,7 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         self.manage_py = self.get_manage_py()
         self.go_to_project_home()
 
-        #Old way command = [self.manage_py] + command
         command = "{} {}".format(self.manage_py,command)
-        print(command)
         thread = CommandThread(command)
         thread.start()
 
@@ -215,7 +213,7 @@ class SetVirtualEnvCommand(VirtualEnvCommand):
         return True
 
     def find_virtualenvs(self, venv_paths):
-        bin  = "Scripts" if PLATFORM == 'Windows' else "bin"
+        bin = "Scripts" if PLATFORM == 'Windows' else "bin"
         venvs = set()
         for path in venv_paths:
             path = os.path.expanduser(path)
