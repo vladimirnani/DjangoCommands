@@ -44,7 +44,7 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         binary = self.settings.get('python_bin')
         self.manage_py = self.get_manage_py()
         self.go_to_project_home()
-
+ 
         command = "{} {}".format(self.manage_py,command)
         thread = CommandThread(command)
         thread.start()
@@ -60,9 +60,10 @@ class CommandThread(threading.Thread):
         command = "{}".format(self.command)
 
         if PLATFORM == 'Windows':
+            endCommand = "&& timeout /T 10 && exit"
             command = [
                 'cmd.exe',
-                '/k', command
+                '/k', "{} {}".format(command,endCommand)
             ]
         if PLATFORM == 'Linux':
             command = [
@@ -158,15 +159,17 @@ class DjangoTestAppCommand(DjangoAppCommand):
     app_descriptor = 'tests.py'
 
 
-class DjangoSchemaMigrationCommand(DjangoAppCommand):
-    command = 'schemamigration'
-    extra_args = ['--auto']
+class DjangoMakeMigrationCommand(DjangoAppCommand):
+    command = 'makemigration'
+    # extra_args = ['--auto']
 
 
 class DjangoListMigrationsCommand(DjangoSimpleCommand):
     command = 'migrate'
     extra_args = ['--list']
 
+class DjangoSqlMigrationCommand(DjangoSimpleCommand):
+    command = 'sqlmigration'
 
 class DjangoCustomCommand(DjangoCommand):
 
