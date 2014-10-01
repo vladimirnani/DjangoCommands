@@ -5,7 +5,6 @@ import subprocess
 import os
 import glob
 import platform
-import shlex
 from functools import partial
 
 SETTINGS_FILE = 'DjangoCommands.sublime-settings'
@@ -60,10 +59,9 @@ class CommandThread(threading.Thread):
         command = "{}".format(self.command)
 
         if PLATFORM == 'Windows':
-            endCommand = "&& timeout /T 10 && exit"
             command = [
                 'cmd.exe',
-                '/k', "{} {}".format(command,endCommand)
+                '/k', "{} && timeout /T 10 && exit".format(command)
             ]
         if PLATFORM == 'Linux':
             command = [
@@ -159,8 +157,8 @@ class DjangoTestAppCommand(DjangoAppCommand):
     app_descriptor = 'tests.py'
 
 
-class DjangoMakeMigrationCommand(DjangoAppCommand):
-    command = 'makemigration'
+class DjangoMakeMigrationCommand(DjangoSimpleCommand):
+    command = 'makemigrations'
     # extra_args = ['--auto']
 
 
@@ -181,7 +179,7 @@ class DjangoCustomCommand(DjangoCommand):
         command = command
         if command.strip() == '':
             return
-        command = shlex.split(command)
+        print(command)
         self.run_command(command)
 
 
