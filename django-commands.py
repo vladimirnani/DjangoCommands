@@ -5,8 +5,8 @@ import subprocess
 import os
 import glob
 import platform
-import shlex
 import shutil
+
 from functools import partial
 
 SETTINGS_FILE = 'DjangoCommands.sublime-settings'
@@ -52,6 +52,7 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         self.go_to_project_home()
 
         command = "{} {} {}".format(binary,self.manage_py,command)
+
         thread = CommandThread(command)
         thread.start()
 
@@ -68,7 +69,7 @@ class CommandThread(threading.Thread):
         if PLATFORM == 'Windows':
             command = [
                 'cmd.exe',
-                '/k', command
+                '/k', "{} && timeout /T 10 && exit".format(command)
             ]
         if PLATFORM == 'Linux':
             command = [
@@ -164,15 +165,17 @@ class DjangoTestAppCommand(DjangoAppCommand):
     app_descriptor = 'tests.py'
 
 
-class DjangoSchemaMigrationCommand(DjangoAppCommand):
-    command = 'schemamigration'
-    extra_args = ['--auto']
+class DjangoMakeMigrationCommand(DjangoSimpleCommand):
+    command = 'makemigrations'
+    # extra_args = ['--auto']
 
 
 class DjangoListMigrationsCommand(DjangoSimpleCommand):
     command = 'migrate'
     extra_args = ['--list']
 
+class DjangoSqlMigrationCommand(DjangoSimpleCommand):
+    command = 'sqlmigration'
 
 class DjangoCustomCommand(DjangoCommand):
 
@@ -184,7 +187,6 @@ class DjangoCustomCommand(DjangoCommand):
         command = command
         if command.strip() == '':
             return
-        command = shlex.split(command)
         self.run_command(command)
 
 
@@ -241,3 +243,4 @@ class SetVirtualEnvCommand(VirtualEnvCommand):
         choices = self.find_virtualenvs(venv_paths)
         choices = [[path.split(os.path.sep)[-2], path] for path in choices]
         self.choose(choices, self.set_virtualenv)
+        
