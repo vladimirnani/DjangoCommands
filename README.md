@@ -47,7 +47,8 @@ Currently supports following commands:
 ### Settings
 
  * `python_bin`: path to python interpreter
- * `python_virtualenv_paths`: list of paths where virtualenvs are located (ex:`~/.virtualenvs/`)
+ * `python_virtualenv_paths`: list of paths where virtualenvs are located (ex:`/home/[username]/.virtualenvs/`)
+**(it's important to set your envs directories)**
 
 #### Virtual Environment:
  * `Django: Set Virtual Environment`
