@@ -226,6 +226,7 @@ class SetVirtualEnvCommand(VirtualEnvCommand):
         for path in venv_paths:
             path = os.path.expanduser(path)
             pattern = os.path.join(path, "*", binary, "activate_this.py")
+            print(pattern)
             venvs.update(list(map(os.path.dirname, glob.glob(pattern))))
         return sorted(venvs)
 
@@ -243,4 +244,3 @@ class SetVirtualEnvCommand(VirtualEnvCommand):
         choices = self.find_virtualenvs(venv_paths)
         choices = [[path.split(os.path.sep)[-2], path] for path in choices]
         self.choose(choices, self.set_virtualenv)
-        
