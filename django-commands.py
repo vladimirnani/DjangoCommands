@@ -20,13 +20,33 @@ class DjangoCommand(sublime_plugin.WindowCommand):
 
     def __init__(self, *args, **kwargs):
         self.settings = sublime.load_settings(SETTINGS_FILE)
+        self.projectFlag = False
         sublime_plugin.WindowCommand.__init__(self, *args, **kwargs)
+
+    def changeFlag(self,response):
+        if response == "Y" or response == "y":
+            self.projectFlag = True
+        elif response == "N" or response == "n":
+            self.projectFlag = False
+    
+    def on_cancel_input(self):
+        self.projectFlag = False
 
     def get_manage_py(self):
         return self.settings.get('django_project_root') or self.find_manage_py()
 
     def get_executable(self):
-        return shutil.which('python')
+        self.projectFlag = False
+        project = self.window.project_data()
+        print("{} {}".format(project['settings']['python_interpreter'],self.projectFlag))
+        if project['settings']['python_interpreter'] is not None:
+            caption = "Want to use project interpreter:(Y/N):"
+            self.window.show_input_panel(caption, '', self.changeFlag, None, self.on_cancel_input)
+
+        if self.projectFlag is True:
+            return project['settings']['python_interpreter']
+        else:
+            return shutil.which('python')
 
     def find_manage_py(self):
         for path in sublime.active_window().folders():
@@ -39,7 +59,10 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         self.window.show_quick_panel(choices, on_input)
 
     def go_to_project_home(self):
-        if self.manage_py is None:
+        try:
+            if self.manage_py is None:
+                return
+        except:
             return
         base_dir = os.path.abspath(os.path.join(self.manage_py, os.pardir))
         os.chdir(base_dir)
@@ -226,7 +249,6 @@ class SetVirtualEnvCommand(VirtualEnvCommand):
         for path in venv_paths:
             path = os.path.expanduser(path)
             pattern = os.path.join(path, "*", binary, "activate_this.py")
-            print(pattern)
             venvs.update(list(map(os.path.dirname, glob.glob(pattern))))
         return sorted(venvs)
 
