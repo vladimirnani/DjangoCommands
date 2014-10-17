@@ -38,7 +38,6 @@ class DjangoCommand(sublime_plugin.WindowCommand):
     def get_executable(self):
         self.projectFlag = False
         project = self.window.project_data()
-        print("{} {}".format(project['settings']['python_interpreter'],self.projectFlag))
         if project['settings']['python_interpreter'] is not None:
             caption = "Want to use project interpreter:(Y/N):"
             self.window.show_input_panel(caption, '', self.changeFlag, None, self.on_cancel_input)
