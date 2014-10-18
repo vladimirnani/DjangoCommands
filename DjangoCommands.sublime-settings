@@ -11,6 +11,6 @@
         "~\\.venv" // venv.bash https://github.com/wuub/venv
     ],
     //Python executable version (in case of using the default)
-    "python_version": "3",
+    "python_version": 3,
 
 }
