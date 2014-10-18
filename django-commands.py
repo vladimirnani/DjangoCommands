@@ -12,6 +12,7 @@ from functools import partial
 SETTINGS_FILE = 'DjangoCommands.sublime-settings'
 PLATFORM = platform.system()
 
+
 def log(message):
     print(' - Django: {0}'.format(message))
 
@@ -21,31 +22,30 @@ class DjangoCommand(sublime_plugin.WindowCommand):
     def __init__(self, *args, **kwargs):
         self.settings = sublime.load_settings(SETTINGS_FILE)
         self.projectFlag = False
+        self.interpreter_versions = {2: "python2", 3: "python3"}
         sublime_plugin.WindowCommand.__init__(self, *args, **kwargs)
 
-    def changeFlag(self,response):
-        if response == "Y" or response == "y":
-            self.projectFlag = True
-        elif response == "N" or response == "n":
-            self.projectFlag = False
-    
-    def on_cancel_input(self):
-        self.projectFlag = False
-
     def get_manage_py(self):
-        return self.settings.get('django_project_root') or self.find_manage_py()
+        return self.settings.get('django_project_root')or self.find_manage_py()
 
     def get_executable(self):
-        self.projectFlag = False
-        project = self.window.project_data()
-        if project['settings']['python_interpreter'] is not None:
-            caption = "Want to use project interpreter:(Y/N):"
-            self.window.show_input_panel(caption, '', self.changeFlag, None, self.on_cancel_input)
 
-        if self.projectFlag is True:
-            return project['settings']['python_interpreter']
+        project = self.window.project_data()
+        settings_exists = 'settings' in project.keys()
+        if settings_exists:
+            project_interpreter = project['settings'].get('python_interpreter')
+            if project_interpreter is not None:
+                caption = "Want to use project interpreter?"
+                self.projectFlag = sublime.ok_cancel_dialog(caption, "Yes")
+            if self.projectFlag is True:
+                self.settings.set("python_bin", project_interpreter)
+                return project_interpreter
+            else:
+                version = self.settings.get("python_version")
+                return shutil.which(self.interpreter_versions[version])
         else:
-            return shutil.which('python')
+            version = self.settings.get("python_version")
+            return shutil.which(self.interpreter_versions[version])
 
     def find_manage_py(self):
         for path in sublime.active_window().folders():
@@ -73,7 +73,7 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         self.manage_py = self.get_manage_py()
         self.go_to_project_home()
 
-        command = "{} {} {}".format(binary,self.manage_py,command)
+        command = "{} {} {}".format(binary, self.manage_py, command)
 
         thread = CommandThread(command)
         thread.start()
@@ -102,8 +102,10 @@ class CommandThread(threading.Thread):
             command = [
                 'osascript',
                 '-e', 'tell app "Terminal" to activate',
-                '-e', 'tell application "System Events" to tell process "Terminal" to keystroke "t" using command down',
-                '-e', 'tell application "Terminal" to do script "{0}" in front window'.format(command)
+                '-e', 'tell application "System Events" to tell process \
+                "Terminal" to keystroke "t" using command down',
+                '-e', 'tell application "Terminal" to \
+                do script "{0}" in front window'.format(command)
             ]
 
         log('Command is : {0}'.format(str(command)))
@@ -196,8 +198,10 @@ class DjangoListMigrationsCommand(DjangoSimpleCommand):
     command = 'migrate'
     extra_args = ['--list']
 
+
 class DjangoSqlMigrationCommand(DjangoSimpleCommand):
-    command = 'sqlmigration'
+    command = 'sqlmigrate'
+
 
 class DjangoCustomCommand(DjangoCommand):
 
@@ -223,7 +227,8 @@ class VirtualEnvCommand(DjangoCommand):
         self.manage_py = self.get_manage_py()
         self.go_to_project_home()
         bin_dir = os.path.dirname(self.settings.get('python_bin'))
-        command = [os.path.join(bin_dir, self.command)] + self.extra_args
+        command = "{} {}".format(
+            os.path.join(bin_dir, self.command), "".join(self.extra_args))
         thread = CommandThread(command)
         thread.start()
 
@@ -265,3 +270,12 @@ class SetVirtualEnvCommand(VirtualEnvCommand):
         choices = self.find_virtualenvs(venv_paths)
         choices = [[path.split(os.path.sep)[-2], path] for path in choices]
         self.choose(choices, self.set_virtualenv)
+
+
+class ChangeDefaultCommand(VirtualEnvCommand):
+
+    def use_default(self):
+        self.settings.erase('python_bin')
+
+    def run(self):
+        self.use_default()

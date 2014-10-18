@@ -39,7 +39,10 @@ Currently supports following commands:
  * `Django: Help`
 
 ##### new in Django 1.7
+ * `Django: SQLMigration
+
 ###### _(south compatible)_
+
  * `Django: Migrate Database`
  * `Django: Schema Migration`
  * `Django: List Migrations`
@@ -47,7 +50,7 @@ Currently supports following commands:
 ### Settings
 
  * `python_bin`: path to python interpreter
- * `python_virtualenv_paths`: list of paths where virtualenvs are located (ex:`/home/[username]/.virtualenvs/`)
+ * `python_virtualenv_paths`: list of paths where virtualenvs are located (ex:`~/.virtualenvs/`)
 **(it's important to set your envs directories)**
 
 #### Virtual Environment:
