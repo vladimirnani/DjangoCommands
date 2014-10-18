@@ -191,7 +191,11 @@ class DjangoTestAppCommand(DjangoAppCommand):
 
 class DjangoMakeMigrationCommand(DjangoSimpleCommand):
     command = 'makemigrations'
-    # extra_args = ['--auto']
+
+
+class DjangoSchemaMigrationCommand(DjangoSimpleCommand):
+    command = 'schemamigration'
+    extra_args = ['--auto']
 
 
 class DjangoListMigrationsCommand(DjangoSimpleCommand):

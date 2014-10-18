@@ -62,5 +62,9 @@
     {
         "caption": "Django: Use default interpreter",
         "command": "change_default"
+    },
+    {
+        "caption": "Django: Migrate Schema",
+        "command": "django_schema_migration"
     }
 ]
