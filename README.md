@@ -9,6 +9,10 @@ You can also run `Django: Custom Command` to access other manage.py commands. Tr
 
 Currently tested on Windows 7/8, Mac OS, Ubuntu.
 
+## New Features:
+	* `Django 1.7 support`
+	* `Option for project interpreter`
+
 ## Installation
 
 ### Package Control
@@ -39,7 +43,7 @@ Currently supports following commands:
  * `Django: Help`
 
 ##### new in Django 1.7
- * `Django: SQLMigration
+ * `Django: SQLMigration`
 
 ###### _(south compatible)_
 
@@ -50,7 +54,9 @@ Currently supports following commands:
 ### Settings
 
  * `python_bin`: path to python interpreter
+ * `python_version` : default python interpreter version
  * `python_virtualenv_paths`: list of paths where virtualenvs are located (ex:`~/.virtualenvs/`)
+
 **(it's important to set your envs directories)**
 
 #### Virtual Environment:

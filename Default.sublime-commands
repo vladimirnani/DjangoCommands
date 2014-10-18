@@ -56,11 +56,11 @@
         "command": "django_custom"
     },
     {
-        "caption": "Django: SqlMigration",
+        "caption": "Django: Sql Migration",
         "command": "django_sql_migration"
     },
     {
-        "caption": "Django: Use default interpreter",
+        "caption": "Django: Use Default Interpreter",
         "command": "change_default"
     },
     {
