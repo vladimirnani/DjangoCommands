@@ -11,8 +11,8 @@ Currently tested on Windows 7/8, Mac OS, Ubuntu.
 
 ## New Features:
 
-	* Django 1.7 support
-	* Option for project interpreter
+ * Django 1.7 support
+ * Option for project interpreter
 
 ## Installation
 
