@@ -5,8 +5,12 @@
     // Force finding manage.py in this directory
     "django_project_root" : null,
     // List of paths where to find virtual environments
+    //
     "python_virtualenv_paths": [
-        "~\\.virtualenvs",  // virtualenvwrapper
-        "~\\.venv"  // venv.bash https://github.com/wuub/venv
-    ]
+         "~\\.virtualenvs", // virtualenvwrapper
+        "~\\.venv" // venv.bash https://github.com/wuub/venv
+    ],
+    //Python executable version (in case of using the default)
+    "python_version": 3,
+
 }

@@ -5,12 +5,13 @@ import subprocess
 import os
 import glob
 import platform
-import shlex
 import shutil
+
 from functools import partial
 
 SETTINGS_FILE = 'DjangoCommands.sublime-settings'
 PLATFORM = platform.system()
+
 
 def log(message):
     print(' - Django: {0}'.format(message))
@@ -20,13 +21,31 @@ class DjangoCommand(sublime_plugin.WindowCommand):
 
     def __init__(self, *args, **kwargs):
         self.settings = sublime.load_settings(SETTINGS_FILE)
+        self.projectFlag = False
+        self.interpreter_versions = {2: "python2", 3: "python3"}
         sublime_plugin.WindowCommand.__init__(self, *args, **kwargs)
 
     def get_manage_py(self):
-        return self.settings.get('django_project_root') or self.find_manage_py()
+        return self.settings.get('django_project_root')or self.find_manage_py()
 
     def get_executable(self):
-        return shutil.which('python')
+
+        project = self.window.project_data()
+        settings_exists = 'settings' in project.keys()
+        if settings_exists:
+            project_interpreter = project['settings'].get('python_interpreter')
+            if project_interpreter is not None:
+                caption = "Want to use project interpreter?"
+                self.projectFlag = sublime.ok_cancel_dialog(caption, "Yes")
+            if self.projectFlag is True:
+                self.settings.set("python_bin", project_interpreter)
+                return project_interpreter
+            else:
+                version = self.settings.get("python_version")
+                return shutil.which(self.interpreter_versions[version])
+        else:
+            version = self.settings.get("python_version")
+            return shutil.which(self.interpreter_versions[version])
 
     def find_manage_py(self):
         for path in sublime.active_window().folders():
@@ -39,7 +58,10 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         self.window.show_quick_panel(choices, on_input)
 
     def go_to_project_home(self):
-        if self.manage_py is None:
+        try:
+            if self.manage_py is None:
+                return
+        except:
             return
         base_dir = os.path.abspath(os.path.join(self.manage_py, os.pardir))
         os.chdir(base_dir)
@@ -51,7 +73,8 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         self.manage_py = self.get_manage_py()
         self.go_to_project_home()
 
-        command = "{} {} {}".format(binary,self.manage_py,command)
+        command = "{} {} {}".format(binary, self.manage_py, command)
+
         thread = CommandThread(command)
         thread.start()
 
@@ -68,7 +91,7 @@ class CommandThread(threading.Thread):
         if PLATFORM == 'Windows':
             command = [
                 'cmd.exe',
-                '/k', command
+                '/k', "{} && timeout /T 10 && exit".format(command)
             ]
         if PLATFORM == 'Linux':
             command = [
@@ -79,8 +102,10 @@ class CommandThread(threading.Thread):
             command = [
                 'osascript',
                 '-e', 'tell app "Terminal" to activate',
-                '-e', 'tell application "System Events" to tell process "Terminal" to keystroke "t" using command down',
-                '-e', 'tell application "Terminal" to do script "{0}" in front window'.format(command)
+                '-e', 'tell application "System Events" to tell process \
+                "Terminal" to keystroke "t" using command down',
+                '-e', 'tell application "Terminal" to \
+                do script "{0}" in front window'.format(command)
             ]
 
         log('Command is : {0}'.format(str(command)))
@@ -164,7 +189,11 @@ class DjangoTestAppCommand(DjangoAppCommand):
     app_descriptor = 'tests.py'
 
 
-class DjangoSchemaMigrationCommand(DjangoAppCommand):
+class DjangoMakeMigrationCommand(DjangoSimpleCommand):
+    command = 'makemigrations'
+
+
+class DjangoSchemaMigrationCommand(DjangoSimpleCommand):
     command = 'schemamigration'
     extra_args = ['--auto']
 
@@ -172,6 +201,10 @@ class DjangoSchemaMigrationCommand(DjangoAppCommand):
 class DjangoListMigrationsCommand(DjangoSimpleCommand):
     command = 'migrate'
     extra_args = ['--list']
+
+
+class DjangoSqlMigrationCommand(DjangoSimpleCommand):
+    command = 'sqlmigrate'
 
 
 class DjangoCustomCommand(DjangoCommand):
@@ -184,7 +217,6 @@ class DjangoCustomCommand(DjangoCommand):
         command = command
         if command.strip() == '':
             return
-        command = shlex.split(command)
         self.run_command(command)
 
 
@@ -199,7 +231,8 @@ class VirtualEnvCommand(DjangoCommand):
         self.manage_py = self.get_manage_py()
         self.go_to_project_home()
         bin_dir = os.path.dirname(self.settings.get('python_bin'))
-        command = [os.path.join(bin_dir, self.command)] + self.extra_args
+        command = "{} {}".format(
+            os.path.join(bin_dir, self.command), "".join(self.extra_args))
         thread = CommandThread(command)
         thread.start()
 
@@ -241,3 +274,12 @@ class SetVirtualEnvCommand(VirtualEnvCommand):
         choices = self.find_virtualenvs(venv_paths)
         choices = [[path.split(os.path.sep)[-2], path] for path in choices]
         self.choose(choices, self.set_virtualenv)
+
+
+class ChangeDefaultCommand(VirtualEnvCommand):
+
+    def use_default(self):
+        self.settings.erase('python_bin')
+
+    def run(self):
+        self.use_default()

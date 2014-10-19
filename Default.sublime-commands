@@ -12,8 +12,8 @@
         "command": "django_migrate"
     },
     {
-        "caption": "Django: Migrate Schema",
-        "command": "django_schema_migration"
+        "caption": "Django: Make Migration",
+        "command": "django_make_migration"
     },
     {
         "caption": "Django: List Migrations",
@@ -54,5 +54,17 @@
     {
         "caption": "Django: Custom Command",
         "command": "django_custom"
+    },
+    {
+        "caption": "Django: Sql Migration",
+        "command": "django_sql_migration"
+    },
+    {
+        "caption": "Django: Use Default Interpreter",
+        "command": "change_default"
+    },
+    {
+        "caption": "Django: Migrate Schema",
+        "command": "django_schema_migration"
     }
 ]

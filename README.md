@@ -1,4 +1,4 @@
-# DjangoCommands for ST2/ST3
+# DjangoCommands for ST3
 
 This tool is a Sublime Text wrapper around django `manage.py` commands.
 
@@ -8,6 +8,11 @@ You can also run `Django: Custom Command` to access other manage.py commands. Tr
 
 
 Currently tested on Windows 7/8, Mac OS, Ubuntu.
+
+## New Features:
+
+	* Django 1.7 support
+	* Option for project interpreter
 
 ## Installation
 
@@ -38,7 +43,11 @@ Currently supports following commands:
  * `Django: Check`
  * `Django: Help`
 
-#### South:
+##### new in Django 1.7
+ * `Django: SQLMigration`
+
+###### _(south compatible)_
+
  * `Django: Migrate Database`
  * `Django: Schema Migration`
  * `Django: List Migrations`
@@ -46,7 +55,10 @@ Currently supports following commands:
 ### Settings
 
  * `python_bin`: path to python interpreter
+ * `python_version` : default python interpreter version
  * `python_virtualenv_paths`: list of paths where virtualenvs are located (ex:`~/.virtualenvs/`)
+
+**(it's important to set your envs directories)**
 
 #### Virtual Environment:
  * `Django: Set Virtual Environment`
