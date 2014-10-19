@@ -87,7 +87,7 @@ class CommandThread(threading.Thread):
 
     def run(self):
         command = "{}".format(self.command)
-
+        env = os.environ.copy()
         if PLATFORM == 'Windows':
             command = [
                 'cmd.exe',
@@ -109,7 +109,7 @@ class CommandThread(threading.Thread):
             ]
 
         log('Command is : {0}'.format(str(command)))
-        subprocess.Popen(command, shell=False)
+        subprocess.Popen(command, shell=False, env=env)
 
 
 class DjangoSimpleCommand(DjangoCommand):
@@ -280,6 +280,7 @@ class ChangeDefaultCommand(VirtualEnvCommand):
 
     def use_default(self):
         self.settings.erase('python_bin')
+        sublime.save_settings(SETTINGS_FILE)
 
     def run(self):
         self.use_default()
