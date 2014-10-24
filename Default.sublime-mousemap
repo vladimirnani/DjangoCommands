@@ -1,0 +1,9 @@
+[
+	{
+		"button": "button1", "modifiers": ["ctrl"]
+		, "command": "django_click"
+		, "press_command": "drag_select"
+		// context is not supported currently in mousemap (!)
+		// ,"context":[{ "key": "selector", "operator": "equal", "operand": "storage.type.attr.django" }]
+	}
+]
