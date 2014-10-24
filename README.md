@@ -74,7 +74,8 @@ With the [Django Click](https://sublime.wbond.net/packages/Django%20Click) plugi
 * `Django: Click`
 
 and all the known keybindings and everything.
-##### People only using "Django click" still can use it as it will be mantained by a contributor of "Django Manage Commands" [Proyecto513](https://github.com/Proyecto513)
+
+People only using "Django click" still can use it as it will be mantained by a contributor of "Django Manage Commands" [Proyecto513](https://github.com/Proyecto513)
 
 Thanks to [Kahi](https://github.com/kahi) for this useful tool.
 
