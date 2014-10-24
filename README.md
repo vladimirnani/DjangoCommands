@@ -69,14 +69,14 @@ Currently supports following commands:
 
 ##Django Click
 
-	With the [Django Click](https://sublime.wbond.net/packages/Django%20Click) plugin no longer in active development, I tried to fix the issues, and after consulting with the repository owner, the functionalities and fixes have been implemented inside "Django Manage Commands" with the command:
+With the [Django Click](https://sublime.wbond.net/packages/Django%20Click) plugin no longer in active development, I tried to fix the issues, and after consulting with the repository owner, the functionalities and fixes have been implemented inside "Django Manage Commands" with the command:
 
-	* `Django: Click`
+* `Django: Click`
 
-	and all the known keybindings and everything.
-	##### People only using "Django click" still can use it as it will be mantained by a contributor of "Django Manage Commands" [Proyecto513](https://github.com/Proyecto513)
+and all the known keybindings and everything.
+##### People only using "Django click" still can use it as it will be mantained by a contributor of "Django Manage Commands" [Proyecto513](https://github.com/Proyecto513)
 
-	Thanks to [Kahi](https://github.com/kahi) for this useful tool.
+Thanks to [Kahi](https://github.com/kahi) for this useful tool.
 
 #### Please report any issue, bug, enhacement or comment [here](https://github.com/vladimirnani/DjangoCommands/issues) 
 #### I'll be glad to read your feedbacks
