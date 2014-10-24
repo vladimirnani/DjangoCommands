@@ -42,7 +42,8 @@ Currently supports following commands:
  * `Django: Custom Command`
  * `Django: Check`
  * `Django: Help`
-
+ * `Django: Use Default Interpreter`
+ 
 ##### new in Django 1.7
  * `Django: SQLMigration`
 
@@ -64,3 +65,6 @@ Currently supports following commands:
  * `Django: Set Virtual Environment`
  * `Django: Terminal Here`
  * `Django: Pip Freeze`
+
+#### Please report any issue, bug, enhacement or comment [here](https://github.com/vladimirnani/DjangoCommands/issues) 
+#### I'll be glad to read your feedbacks

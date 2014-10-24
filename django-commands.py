@@ -232,13 +232,27 @@ class VirtualEnvCommand(DjangoCommand):
         self.go_to_project_home()
         bin_dir = os.path.dirname(self.settings.get('python_bin'))
         command = "{} {}".format(
-            os.path.join(bin_dir, self.command), "".join(self.extra_args))
+            os.path.join(bin_dir, self.command), " ".join(self.extra_args))
         thread = CommandThread(command)
         thread.start()
 
 
 class TerminalHereCommand(VirtualEnvCommand):
     command = 'activate'
+
+    def run(self):
+        self.manage_py = self.get_manage_py()
+        self.go_to_project_home()
+        bin_dir = os.path.dirname(self.settings.get('python_bin'))
+        if PLATFORM == 'Windows':
+            command = 'cmd \K {}'.format(
+                os.path.join(bin_dir, self.command))
+        if PLATFORM == 'Linux' or PLATFORM == 'Darwin':
+            command = "bash --rcfile <(echo 'source {}')".format(
+                os.path.join(bin_dir, self.command))
+
+        thread = CommandThread(command)
+        thread.start()
 
 
 class PipFreezeCommand(VirtualEnvCommand):
