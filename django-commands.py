@@ -6,6 +6,7 @@ import os
 import glob
 import platform
 import shutil
+import re
 
 from functools import partial
 
@@ -168,6 +169,10 @@ class DjangoShellCommand(DjangoSimpleCommand):
     command = 'shell'
 
 
+class DjangoDbShellCommand(DjangoSimpleCommand):
+    command = 'dbshell'
+
+
 class DjangoCheckCommand(DjangoSimpleCommand):
     command = 'check'
 
@@ -232,13 +237,27 @@ class VirtualEnvCommand(DjangoCommand):
         self.go_to_project_home()
         bin_dir = os.path.dirname(self.settings.get('python_bin'))
         command = "{} {}".format(
-            os.path.join(bin_dir, self.command), "".join(self.extra_args))
+            os.path.join(bin_dir, self.command), " ".join(self.extra_args))
         thread = CommandThread(command)
         thread.start()
 
 
 class TerminalHereCommand(VirtualEnvCommand):
     command = 'activate'
+
+    def run(self):
+        self.manage_py = self.get_manage_py()
+        self.go_to_project_home()
+        bin_dir = os.path.dirname(self.settings.get('python_bin'))
+        if PLATFORM == 'Windows':
+            command = 'cmd \K {}'.format(
+                os.path.join(bin_dir, self.command))
+        if PLATFORM == 'Linux' or PLATFORM == 'Darwin':
+            command = "bash --rcfile <(echo 'source {}')".format(
+                os.path.join(bin_dir, self.command))
+
+        thread = CommandThread(command)
+        thread.start()
 
 
 class PipFreezeCommand(VirtualEnvCommand):
@@ -284,3 +303,48 @@ class ChangeDefaultCommand(VirtualEnvCommand):
 
     def run(self):
         self.use_default()
+
+
+class DjangoClickCommand(sublime_plugin.TextCommand):
+    TEMPLATE_DIR = 'templates'
+
+    def parse_tag(self, line):
+
+        RE_PARAMS = re.compile(r'(with)|(\w+=[\'"]\w+[\'"])')
+
+        RE_BLOCK = re.compile(
+            r'.*{%%\s*(?P<tag>%s)\s+(?P<names>.+)?[\'"]?\s*%%}'
+            % '|'.join(['include', 'extends', 'includeblocks']))
+        RE_NAMES = re.compile(r'[\'"]([/\.\-_a-zA-Z0-9\s]+)[\'"]')
+
+        line = re.sub(RE_PARAMS, "", line)
+
+        match = re.match(RE_BLOCK, line)
+
+        if match:
+            targets = re.findall(RE_NAMES, match.groupdict()['names'])
+
+            return match.groupdict()['tag'], targets
+
+        return None, []
+
+    def run(self, edit):
+        region = self.view.sel()[0]
+        line = self.view.line(region)
+        line_contents = self.view.substr(line)
+
+        tag, targets = self.parse_tag(line_contents)
+
+        if tag:
+            # get the base-path of current file
+            base, current_file = self.view.file_name().split(
+                '%(separator)stemplates%(separator)s' % dict(
+                    separator=os.path.sep), 1)
+
+            for one in targets:
+                # get the target file path
+                tar = os.path.join(base, self.TEMPLATE_DIR, one)
+
+                # open it!
+                window = sublime.active_window()
+                window.open_file(tar, sublime.ENCODED_POSITION)

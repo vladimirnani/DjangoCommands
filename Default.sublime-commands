@@ -66,5 +66,13 @@
     {
         "caption": "Django: Migrate Schema",
         "command": "django_schema_migration"
+    },
+    {
+        "caption": "Django: Click",
+        "command": "django_click"
+    },
+    {
+        "caption": "Django: DB Shell",
+        "command": "django_db_shell"
     }
 ]
