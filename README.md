@@ -59,6 +59,8 @@ Currently supports following commands:
  * `python_bin`: path to python interpreter
  * `python_version` : default python interpreter version
  * `python_virtualenv_paths`: list of paths where virtualenvs are located (ex:`~/.virtualenvs/`)
+ * `server_host`: host for the runserver command
+ * `server_port`: port for the server to listen
 
 **(it's important to set your envs directories)**
 
