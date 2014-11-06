@@ -160,6 +160,13 @@ class DjangoAppCommand(DjangoCommand):
 class DjangoRunCommand(DjangoSimpleCommand):
     command = 'runserver'
 
+    def run(self):
+        port = self.settings.get('server_port')
+        host = self.settings.get('server_host')
+        self.extra_args = [host, port]
+        inComannd = "{} {}:{}".format(self.command, host, port)
+        self.run_command(inComannd)
+
 
 class DjangoSyncdbCommand(DjangoSimpleCommand):
     command = 'syncdb'
