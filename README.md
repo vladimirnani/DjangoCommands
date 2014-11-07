@@ -9,10 +9,12 @@ You can also run `Django: Custom Command` to access other manage.py commands. Tr
 
 Currently tested on Windows 7/8, Mac OS, Ubuntu.
 
-## New Features:
+Everything tested and running!
 
- * Django 1.7 support
- * Option for project interpreter
+* __Django 1.7 support__
+* __Virtualenv support__
+* __South support__
+
 
 ## Installation
 
@@ -44,33 +46,30 @@ Currently supports following commands:
  * `Django: Check`
  * `Django: Help`
  * `Django: Use Default Interpreter`
- 
-##### new in Django 1.7
  * `Django: Make Migration`
- * `Django: SQLMigration`
-
-###### _(south compatible)_
-
- 
+ * `Django: SQLMigration` 
  * `Django: Migrate Database`
  * `Django: Initial Schema Migration`
  * `Django: Schema Migration`
  * `Django: List Migrations`
-
-### Settings
-
- * `python_bin`: path to python interpreter
- * `python_version` : default python interpreter version
- * `python_virtualenv_paths`: list of paths where virtualenvs are located (ex:`~/.virtualenvs/`)
- * `server_host`: host for the runserver command
- * `server_port`: port for the server to listen
-
-**(it's important to set your envs directories)**
+ * `Django: Click`
 
 #### Virtual Environment:
  * `Django: Set Virtual Environment`
  * `Django: Terminal Here`
  * `Django: Pip Freeze`
+
+### Settings
+
+ * `python_bin`: path to python interpreter
+ * `python_version` : default python interpreter version
+ * `python_virtualenv_paths`: list of paths where virtualenvs are located (ex:`~/.virtualenvs/`)*
+ * `server_host`: host for the runserver command
+ * `server_port`: port for the server to listen
+
+*_it's important to set your envs directories_ *
+
+
 
 ##Django Click
 

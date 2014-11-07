@@ -115,9 +115,11 @@ class CommandThread(threading.Thread):
 
 class DjangoSimpleCommand(DjangoCommand):
     command = ''
+    extra_args = []
 
     def run(self):
-        self.run_command(self.command)
+        command = "{} {}".format(self.command, " ".join(self.extra_args))
+        self.run_command(command)
 
 
 class DjangoAppCommand(DjangoCommand):
@@ -228,8 +230,16 @@ class DjangoListMigrationsCommand(DjangoSimpleCommand):
     extra_args = ['--list']
 
 
-class DjangoSqlMigrationCommand(DjangoSimpleCommand):
+class DjangoSqlMigrationCommand(DjangoAppCommand):
     command = 'sqlmigrate'
+
+    def set_migration_name(self, name):
+        self.extra_args = [name]
+        DjangoAppCommand.run(self)
+
+    def run(self):
+        self.window.show_input_panel(
+            "Migration name", "", self.set_migration_name, None, None)
 
 
 class DjangoCustomCommand(DjangoCommand):
