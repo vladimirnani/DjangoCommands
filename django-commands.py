@@ -146,12 +146,16 @@ class DjangoAppCommand(DjangoCommand):
         if index == -1:
             return
         name = apps[index]
-        self.run_command([self.command, name] + self.extra_args)
+        self.run_command(
+            "{} {} {}".format(self.command,
+                              "".join(name),
+                              " ".join(self.extra_args)))
 
     def run(self):
 
         self.go_to_project_home()
         choices = self.find_apps()
+        self.manage_py = self.get_manage_py()
         base_dir = os.path.dirname(self.manage_py)
         choices = [self.prettify(path, base_dir) for path in choices]
         self.choose(choices, self.on_choose_app)
@@ -205,7 +209,12 @@ class DjangoMakeMigrationCommand(DjangoSimpleCommand):
     command = 'makemigrations'
 
 
-class DjangoSchemaMigrationCommand(DjangoSimpleCommand):
+class DjangoInitialSchemaMigrationCommand(DjangoAppCommand):
+    command = 'schemamigration'
+    extra_args = ['--initial']
+
+
+class DjangoSchemaMigrationCommand(DjangoAppCommand):
     command = 'schemamigration'
     extra_args = ['--auto']
 

@@ -68,6 +68,10 @@
         "command": "django_schema_migration"
     },
     {
+        "caption": "Django: Initial Schema Migration",
+        "command": "django_initial_schema_migration"
+    },
+    {
         "caption": "Django: Click",
         "command": "django_click"
     },

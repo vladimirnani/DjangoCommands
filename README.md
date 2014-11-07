@@ -1,4 +1,4 @@
-# DjangoCommands for ST3
+# DjangoCommands for ST2/ST3
 
 This tool is a Sublime Text wrapper around django `manage.py` commands.
 
@@ -46,11 +46,14 @@ Currently supports following commands:
  * `Django: Use Default Interpreter`
  
 ##### new in Django 1.7
+ * `Django: Make Migration`
  * `Django: SQLMigration`
 
 ###### _(south compatible)_
 
+ 
  * `Django: Migrate Database`
+ * `Django: Initial Schema Migration`
  * `Django: Schema Migration`
  * `Django: List Migrations`
 
