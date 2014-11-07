@@ -12,6 +12,10 @@
         "command": "django_migrate"
     },
     {
+        "caption": "Django: Migrate App",
+        "command": "django_migrate_app"
+    },
+    {
         "caption": "Django: Make Migration",
         "command": "django_make_migration"
     },
@@ -66,6 +70,10 @@
     {
         "caption": "Django: Migrate Schema",
         "command": "django_schema_migration"
+    },
+    {
+        "caption": "Django: Initial Schema Migration",
+        "command": "django_initial_schema_migration"
     },
     {
         "caption": "Django: Click",
