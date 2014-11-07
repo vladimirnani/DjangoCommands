@@ -196,6 +196,10 @@ class DjangoMigrateCommand(DjangoSimpleCommand):
     command = 'migrate'
 
 
+class DjangoMigrateAppCommand(DjangoAppCommand):
+    command = 'migrate'
+
+
 class DjangoTestAllCommand(DjangoSimpleCommand):
     command = 'test'
 
