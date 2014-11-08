@@ -60,6 +60,10 @@
         "command": "django_custom"
     },
     {
+        "caption": "Django: Other Command",
+        "command": "django_other"
+    },
+    {
         "caption": "Django: Sql Migration",
         "command": "django_sql_migration"
     },

@@ -67,7 +67,7 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         base_dir = os.path.abspath(os.path.join(self.manage_py, os.pardir))
         os.chdir(base_dir)
 
-    def run_command(self, command):
+    def format_command(self, command):
         binary = self.settings.get('python_bin')
         if binary is None:
             binary = self.get_executable()
@@ -75,7 +75,10 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         self.go_to_project_home()
 
         command = "{} {} {}".format(binary, self.manage_py, command)
+        return command
 
+    def run_command(self, command):
+        command = self.format_command(command)
         thread = CommandThread(command)
         thread.start()
 
@@ -110,15 +113,18 @@ class CommandThread(threading.Thread):
             ]
 
         log('Command is : {0}'.format(str(command)))
-        subprocess.Popen(command, shell=False, env=env)
+        subprocess.Popen(command, env=env)
 
 
 class DjangoSimpleCommand(DjangoCommand):
     command = ''
     extra_args = []
 
+    def get_command(self):
+        return "{} {}".format(self.command, " ".join(self.extra_args))
+
     def run(self):
-        command = "{} {}".format(self.command, " ".join(self.extra_args))
+        command = self.get_command()
         self.run_command(command)
 
 
@@ -154,13 +160,32 @@ class DjangoAppCommand(DjangoCommand):
                               " ".join(self.extra_args)))
 
     def run(self):
-
         self.go_to_project_home()
         choices = self.find_apps()
         self.manage_py = self.get_manage_py()
         base_dir = os.path.dirname(self.manage_py)
         choices = [self.prettify(path, base_dir) for path in choices]
         self.choose(choices, self.on_choose_app)
+
+
+class DjangoOtherCommand(DjangoSimpleCommand):
+
+    def get_commands(self):
+        command = self.format_command('help --commands')
+        out = str(subprocess.check_output(command))
+        out = re.search('b\'(.*)\'', out).group(1)
+        commands = out.split('\\r\\n')[:-1]
+        return commands
+
+    def on_choose_command(self, commands, index):
+        if index == -1:
+            return
+        name = commands[index]
+        self.run_command(name)
+
+    def run(self):
+        commands = self.get_commands()
+        self.choose(commands, self.on_choose_command)
 
 
 class DjangoRunCommand(DjangoSimpleCommand):
