@@ -43,6 +43,7 @@ Currently supports following commands:
  * `Django: Shell`
  * `Django: DB Shell`
  * `Django: Custom Command`
+ * `Django: Other Command`
  * `Django: Check`
  * `Django: Help`
  * `Django: Use Default Interpreter`
