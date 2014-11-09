@@ -171,10 +171,12 @@ class DjangoAppCommand(DjangoCommand):
 class DjangoOtherCommand(DjangoSimpleCommand):
 
     def get_commands(self):
-        command = self.format_command('help --commands')
+        forSplit = self.format_command('help --commands')
+        command = forSplit.split(' ')
+        print(command)
         out = str(subprocess.check_output(command))
         out = re.search('b\'(.*)\'', out).group(1)
-        commands = out.split('\\r\\n')[:-1]
+        commands = out.split('\\n')[:-1]
         return commands
 
     def on_choose_command(self, commands, index):
