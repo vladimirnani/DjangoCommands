@@ -12,6 +12,7 @@ from functools import partial
 
 SETTINGS_FILE = 'DjangoCommands.sublime-settings'
 PLATFORM = platform.system()
+TERMINAL = ''
 
 
 def log(message):
@@ -78,6 +79,9 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         return command
 
     def run_command(self, command):
+        global TERMINAL
+        if PLATFORM == "Linux":
+            TERMINAL = self.settings.get('linux-terminal')
         command = self.format_command(command)
         thread = CommandThread(command)
         thread.start()
@@ -99,7 +103,7 @@ class CommandThread(threading.Thread):
             ]
         if PLATFORM == 'Linux':
             command = [
-                'gnome-terminal',
+                TERMINAL,
                 '-e', 'bash -c \"{0}; read line\"'.format(command)
             ]
         if PLATFORM == 'Darwin':
