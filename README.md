@@ -1,6 +1,6 @@
 # DjangoCommands for ST2/ST3
 
-###The best tool for your django development
+###The best tool for your django development chores.
 
 This tool is a Sublime Text wrapper around django `manage.py` commands.
 
