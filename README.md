@@ -1,5 +1,7 @@
 # DjangoCommands for ST2/ST3
 
+###The best tool for your django development
+
 This tool is a Sublime Text wrapper around django `manage.py` commands.
 
 With it you can run django commands like `Django: Run Server`, `Django: Sync Database`, `Django: Migrate` from Command Palette.
@@ -59,6 +61,7 @@ Currently supports following commands:
  * `Django: Set Virtual Environment`
  * `Django: Terminal Here`
  * `Django: Pip Freeze`
+ * `Django: Pip Freeze To File`
 
 ### Settings
 
