@@ -171,10 +171,11 @@ class DjangoAppCommand(DjangoCommand):
 class DjangoOtherCommand(DjangoSimpleCommand):
 
     def get_commands(self):
-        command = self.format_command('help --commands')
+        forSplit = self.format_command('help --commands')
+        command = forSplit.split(' ')
         out = str(subprocess.check_output(command))
         out = re.search('b\'(.*)\'', out).group(1)
-        commands = out.split('\\r\\n')[:-1]
+        commands = out.split('\\n')[:-1]
         return commands
 
     def on_choose_command(self, commands, index):
@@ -308,7 +309,7 @@ class TerminalHereCommand(VirtualEnvCommand):
             command = 'cmd \K {}'.format(
                 os.path.join(bin_dir, self.command))
         if PLATFORM == 'Linux' or PLATFORM == 'Darwin':
-            command = "bash --rcfile <(echo 'source {}')".format(
+            command = "bash --rcfile <(echo '. ~/.bashrc && . {}')".format(
                 os.path.join(bin_dir, self.command))
 
         thread = CommandThread(command)
@@ -318,6 +319,20 @@ class TerminalHereCommand(VirtualEnvCommand):
 class PipFreezeCommand(VirtualEnvCommand):
     command = 'pip'
     extra_args = ['freeze']
+
+
+class PipFreezeToFileCommand(VirtualEnvCommand):
+    command = 'pip'
+    extra_args = ['freeze']
+
+    def on_done(self, filename):
+        self.extra_args.append('>')
+        self.extra_args.append(filename)
+        VirtualEnvCommand.run(self)
+
+    def run(self):
+        self.window.show_input_panel(
+            "File name", "requirements.txt", self.on_done, None, None)
 
 
 class SetVirtualEnvCommand(VirtualEnvCommand):
