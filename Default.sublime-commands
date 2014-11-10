@@ -36,6 +36,10 @@
         "command": "pip_freeze"
     },
     {
+        "caption": "Django: Pip Freeze To File",
+        "command": "pip_freeze_to_file"
+    },
+    {
         "caption": "Django: Test",
         "command": "django_test_app"
     },

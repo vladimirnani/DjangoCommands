@@ -173,7 +173,6 @@ class DjangoOtherCommand(DjangoSimpleCommand):
     def get_commands(self):
         forSplit = self.format_command('help --commands')
         command = forSplit.split(' ')
-        print(command)
         out = str(subprocess.check_output(command))
         out = re.search('b\'(.*)\'', out).group(1)
         commands = out.split('\\n')[:-1]
@@ -320,6 +319,20 @@ class TerminalHereCommand(VirtualEnvCommand):
 class PipFreezeCommand(VirtualEnvCommand):
     command = 'pip'
     extra_args = ['freeze']
+
+
+class PipFreezeToFileCommand(VirtualEnvCommand):
+    command = 'pip'
+    extra_args = ['freeze']
+
+    def on_done(self, filename):
+        self.extra_args.append('>')
+        self.extra_args.append(filename)
+        VirtualEnvCommand.run(self)
+
+    def run(self):
+        self.window.show_input_panel(
+            "File name", "requirements.txt", self.on_done, None, None)
 
 
 class SetVirtualEnvCommand(VirtualEnvCommand):
