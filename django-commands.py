@@ -81,7 +81,7 @@ class DjangoCommand(sublime_plugin.WindowCommand):
     def run_command(self, command):
         global TERMINAL
         if PLATFORM == "Linux":
-            TERMINAL = self.settings.get('linux-terminal')
+            TERMINAL = self.settings.get('linux_terminal')
         command = self.format_command(command)
         thread = CommandThread(command)
         thread.start()
