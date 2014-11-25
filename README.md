@@ -70,7 +70,7 @@ Currently supports following commands:
  * `python_virtualenv_paths`: list of paths where virtualenvs are located (ex:`~/.virtualenvs/`)*
  * `server_host`: host for the runserver command
  * `server_port`: port for the server to listen
- * `linux-terminal: Only Linux setting fot command line emulator`
+ * `linux_terminal: Only Linux setting for command line emulator`
 *_it's important to set your envs directories_ *
 
 
