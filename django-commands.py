@@ -315,7 +315,6 @@ class TerminalHereCommand(VirtualEnvCommand):
         if PLATFORM == 'Linux' or PLATFORM == 'Darwin':
             command = "bash --rcfile <(echo '. ~/.bashrc && . {}')".format(
                 os.path.join(bin_dir, self.command))
-        print(command)
         thread = CommandThread(command)
         thread.start()
 
