@@ -179,7 +179,7 @@ class DjangoOtherCommand(DjangoSimpleCommand):
         command = forSplit.split(' ')
         out = str(subprocess.check_output(command))
         out = re.search('b\'(.*)\'', out).group(1)
-        commands = out.split('\\n')[:-1]
+        commands = out.split('\\n')[:-1] if PLATFORM is not "Windows" else out.split('\\r\\n')[:-1]
         return commands
 
     def on_choose_command(self, commands, index):
@@ -310,12 +310,12 @@ class TerminalHereCommand(VirtualEnvCommand):
         self.go_to_project_home()
         bin_dir = os.path.dirname(self.settings.get('python_bin'))
         if PLATFORM == 'Windows':
-            command = 'cmd \K {}'.format(
+            command = 'cmd /k| {}'.format(
                 os.path.join(bin_dir, self.command))
         if PLATFORM == 'Linux' or PLATFORM == 'Darwin':
             command = "bash --rcfile <(echo '. ~/.bashrc && . {}')".format(
                 os.path.join(bin_dir, self.command))
-
+        print(command)
         thread = CommandThread(command)
         thread.start()
 
