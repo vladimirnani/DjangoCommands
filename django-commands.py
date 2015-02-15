@@ -310,7 +310,7 @@ class TerminalHereCommand(VirtualEnvCommand):
         self.go_to_project_home()
         bin_dir = os.path.dirname(self.settings.get('python_bin'))
         if PLATFORM == 'Windows':
-            command = 'cmd /k| {}'.format(
+            command = 'cmd /k {}'.format(
                 os.path.join(bin_dir, self.command))
         if PLATFORM == 'Linux' or PLATFORM == 'Darwin':
             command = "bash --rcfile <(echo '. ~/.bashrc && . {}')".format(
