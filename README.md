@@ -15,8 +15,8 @@ Everything tested and running!
 
 * __Django 1.7 support__
 * __Virtualenv support__
-* __django boilerplate__
-* __create new projects from ST__
+* __Django boilerplate__
+* __Create new projects from ST__
 * __South support__
 
 
