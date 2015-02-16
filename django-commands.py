@@ -470,5 +470,31 @@ urlpatterns = patterns('',
 class WriteHelperCommand(sublime_plugin.TextCommand):
 
     def run(self, edit, text):
-        print("text")
         self.view.insert(edit, 0, text)
+
+
+class DjangoNewProjectCommand(SetVirtualEnvCommand):
+
+    def create_project(self, name):
+        order = os.path.join(os.path.abspath(os.path.dirname(self.interpreter)), "django-admin")
+        command = [self.interpreter, order, "startproject", name, self.window.folders()[0]]
+        print("Command: {} in".format(command))
+        subprocess.Popen(command)
+
+    def set_interpreter(self, index):
+        if index == -1:
+            return
+        name, self.interpreter = self.choices[index]
+        if name is not "default":
+            self.interpreter = os.path.join(self.interpreter, 'python')
+        print(self.interpreter)
+        self.window.show_input_panel("Project name", "", self.create_project, None, None)
+
+    def run(self):
+        venv_paths = self.settings.get("python_virtualenv_paths", [])
+        version = self.settings.get("python_version")
+        envs = self.find_virtualenvs(venv_paths)
+        self.choices = [[path.split(os.path.sep)[-2], path] for path in envs]
+        self.choices.append(["default", shutil.which(self.interpreter_versions[version])])
+        sublime.message_dialog("Select a python interpreter for the new project")
+        self.window.show_quick_panel(self.choices, self.set_interpreter)

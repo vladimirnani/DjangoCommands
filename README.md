@@ -15,6 +15,8 @@ Everything tested and running!
 
 * __Django 1.7 support__
 * __Virtualenv support__
+* __django boilerplate__
+* __create new projects from ST__
 * __South support__
 
 
@@ -37,8 +39,9 @@ Package Control will automatically keep plugin up to date with the latest versio
 Currently supports following commands:
 
 #### Django:
-
+ * `Django: New Project`
  * `Django: Run Server`
+ * `Django: Boilerplate`
  * `Django: Sync Database`
  * `Django: Test`
  * `Django: Test All`

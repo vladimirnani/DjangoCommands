@@ -1,5 +1,9 @@
 [
     {
+        "caption": "Django: New Project",
+        "command": "django_new_project"
+    },
+    {
         "caption": "Django: Run Server",
         "command": "django_run"
     },
