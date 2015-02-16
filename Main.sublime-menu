@@ -1,4 +1,15 @@
 [
+    {
+    "caption": "Tools",
+    "mnemonic": "t",
+    "id": "tools",
+    "children":
+    [
+        {"caption":"New Django project",
+        "command" : "django_new_project"
+        }
+    ]
+    },
    {
         "caption": "Preferences",
         "mnemonic": "n",
