@@ -9,6 +9,7 @@ import shutil
 import re
 
 from functools import partial
+from collections import OrderedDict
 
 SETTINGS_FILE = 'DjangoCommands.sublime-settings'
 PLATFORM = platform.system()
@@ -421,3 +422,53 @@ class DjangoClickCommand(sublime_plugin.TextCommand):
                 # open it!
                 window = sublime.active_window()
                 window.open_file(tar, sublime.ENCODED_POSITION)
+
+
+class DjangoBoilerPlate(sublime_plugin.WindowCommand):
+    options = ['urls', 'models', 'views', 'admin', 'forms', 'tests']
+
+    def on_done(self, index):
+        if index < 0:
+            return
+        urls = """from django.conf.urls import patterns, include, url
+
+urlpatterns = patterns('',
+                       # Examples:
+                       # url(r'^$', 'example.views.home', name='home'),
+                       # url(r'^blog/', include('blog.urls')),
+                       )
+"""
+        admin = """from django.contrib import admin
+
+# Register your models here.
+"""
+        views = """from django.shortcuts import render
+# Create your views here.
+"""
+        models = """from django.db import models
+# Define your models here
+"""
+        forms = """from django import forms
+# Create your forms here
+"""
+        tests = """from django.test import TestCase
+
+# Create your tests here.
+"""
+        # actions = OrderedDict((name, eval(name)) for name in self.options)
+        actions = OrderedDict()
+        for option in self.options:
+            actions[option] = eval(option)
+        text = actions[self.options[index]]
+        self.view = self.window.active_view()
+        self.view.run_command('write_helper', {"text": text})
+
+    def run(self):
+        self.window.show_quick_panel(self.options, self.on_done)
+
+
+class WriteHelperCommand(sublime_plugin.TextCommand):
+
+    def run(self, edit, text):
+        print("text")
+        self.view.insert(edit, 0, text)
