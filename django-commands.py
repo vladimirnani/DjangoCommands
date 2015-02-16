@@ -9,6 +9,7 @@ import shutil
 import re
 
 from functools import partial
+from collections import OrderedDict
 
 SETTINGS_FILE = 'DjangoCommands.sublime-settings'
 PLATFORM = platform.system()
@@ -81,7 +82,7 @@ class DjangoCommand(sublime_plugin.WindowCommand):
     def run_command(self, command):
         global TERMINAL
         if PLATFORM == "Linux":
-            TERMINAL = self.settings.get('linux-terminal')
+            TERMINAL = self.settings.get('linux_terminal')
         command = self.format_command(command)
         thread = CommandThread(command)
         thread.start()
@@ -179,7 +180,7 @@ class DjangoOtherCommand(DjangoSimpleCommand):
         command = forSplit.split(' ')
         out = str(subprocess.check_output(command))
         out = re.search('b\'(.*)\'', out).group(1)
-        commands = out.split('\\n')[:-1]
+        commands = out.split('\\n')[:-1] if PLATFORM is not "Windows" else out.split('\\r\\n')[:-1]
         return commands
 
     def on_choose_command(self, commands, index):
@@ -310,12 +311,11 @@ class TerminalHereCommand(VirtualEnvCommand):
         self.go_to_project_home()
         bin_dir = os.path.dirname(self.settings.get('python_bin'))
         if PLATFORM == 'Windows':
-            command = 'cmd \K {}'.format(
+            command = 'cmd /k {}'.format(
                 os.path.join(bin_dir, self.command))
         if PLATFORM == 'Linux' or PLATFORM == 'Darwin':
             command = "bash --rcfile <(echo '. ~/.bashrc && . {}')".format(
                 os.path.join(bin_dir, self.command))
-
         thread = CommandThread(command)
         thread.start()
 
@@ -422,3 +422,53 @@ class DjangoClickCommand(sublime_plugin.TextCommand):
                 # open it!
                 window = sublime.active_window()
                 window.open_file(tar, sublime.ENCODED_POSITION)
+
+
+class DjangoBoilerPlate(sublime_plugin.WindowCommand):
+    options = ['urls', 'models', 'views', 'admin', 'forms', 'tests']
+
+    def on_done(self, index):
+        if index < 0:
+            return
+        urls = """from django.conf.urls import patterns, include, url
+
+urlpatterns = patterns('',
+                       # Examples:
+                       # url(r'^$', 'example.views.home', name='home'),
+                       # url(r'^blog/', include('blog.urls')),
+                       )
+"""
+        admin = """from django.contrib import admin
+
+# Register your models here.
+"""
+        views = """from django.shortcuts import render
+# Create your views here.
+"""
+        models = """from django.db import models
+# Define your models here
+"""
+        forms = """from django import forms
+# Create your forms here
+"""
+        tests = """from django.test import TestCase
+
+# Create your tests here.
+"""
+        # actions = OrderedDict((name, eval(name)) for name in self.options)
+        actions = OrderedDict()
+        for option in self.options:
+            actions[option] = eval(option)
+        text = actions[self.options[index]]
+        self.view = self.window.active_view()
+        self.view.run_command('write_helper', {"text": text})
+
+    def run(self):
+        self.window.show_quick_panel(self.options, self.on_done)
+
+
+class WriteHelperCommand(sublime_plugin.TextCommand):
+
+    def run(self, edit, text):
+        print("text")
+        self.view.insert(edit, 0, text)
