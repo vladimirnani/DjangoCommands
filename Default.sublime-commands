@@ -48,6 +48,10 @@
         "command": "pip_freeze_to_file"
     },
     {
+        "caption": "Django: Pip install Requirements",
+        "command": "pip_install_requirements"
+    },
+    {
         "caption": "Django: Test",
         "command": "django_test_app"
     },

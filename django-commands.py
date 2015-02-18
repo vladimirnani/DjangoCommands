@@ -340,6 +340,24 @@ class PipFreezeToFileCommand(VirtualEnvCommand):
             "File name", "requirements.txt", self.on_done, None, None)
 
 
+class PipInstallRequirementsCommand(VirtualEnvCommand):
+    command = 'pip'
+    extra_args = ['install', '-r']
+    file_name = 'requirements.txt'
+
+    def another_file(self, text):
+        self.extra_args.append(text)
+        super(PipInstallRequirementsCommand, self).run()
+
+    def run(self):
+        if os.path.exists(self.file_name):
+            self.extra_args.append(self.file_name)
+            super(PipInstallRequirementsCommand, self).run()
+        else:
+            sublime.message_dialog('requirements.txt not found')
+            self.window.show_input_panel('File to install', self.another_file, None, None)
+
+
 class SetVirtualEnvCommand(VirtualEnvCommand):
 
     def is_enabled(self):
