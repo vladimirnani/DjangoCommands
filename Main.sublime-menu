@@ -1,8 +1,8 @@
 [
     {
-    "caption": "Tools",
-    "mnemonic": "t",
-    "id": "tools",
+    "caption": "File",
+    "mnemonic": "f",
+    "id": "file",
     "children":
     [
         {"caption":"New Django project",
