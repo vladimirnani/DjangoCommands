@@ -25,7 +25,8 @@ class DjangoCommand(sublime_plugin.WindowCommand):
     def __init__(self, *args, **kwargs):
         self.settings = sublime.load_settings(SETTINGS_FILE)
         self.projectFlag = False
-        self.interpreter_versions = {2: "python2", 3: "python3"}
+        self.interpreter_versions = {2: "python2",
+                                     3: "python3"} if PLATFORM is not "Windows" else {2: "python", 3: "python"}
         sublime_plugin.WindowCommand.__init__(self, *args, **kwargs)
 
     def get_manage_py(self):
@@ -476,7 +477,7 @@ class WriteHelperCommand(sublime_plugin.TextCommand):
 class DjangoNewProjectCommand(SetVirtualEnvCommand):
 
     def create_project(self, name):
-        order = os.path.join(os.path.abspath(os.path.dirname(self.interpreter)), "django-admin")
+        order = os.path.join(os.path.abspath(os.path.dirname(self.interpreter)), "django-admin.py")
         command = [self.interpreter, order, "startproject", name, self.window.folders()[0]]
         print("Command: {} in".format(command))
         subprocess.Popen(command)
@@ -487,7 +488,6 @@ class DjangoNewProjectCommand(SetVirtualEnvCommand):
         name, self.interpreter = self.choices[index]
         if name is not "default":
             self.interpreter = os.path.join(self.interpreter, 'python')
-        print(self.interpreter)
         self.window.show_input_panel("Project name", "", self.create_project, None, None)
 
     def run(self):
