@@ -83,7 +83,7 @@ class DjangoCommand(sublime_plugin.WindowCommand):
     def run_command(self, command):
         global TERMINAL
         if PLATFORM == "Linux":
-            TERMINAL = self.settings.get('linux_terminal')
+            TERMINAL = self.settings.get('linux_terminal', 'gnome-terminal')
         command = self.format_command(command)
         thread = CommandThread(command)
         thread.start()
@@ -497,7 +497,7 @@ class DjangoNewProjectCommand(SetVirtualEnvCommand):
     def create_project(self, name):
         order = os.path.join(os.path.abspath(os.path.dirname(self.interpreter)), "django-admin.py")
         command = [self.interpreter, order, "startproject", name, self.window.folders()[0]]
-        print("Command: {} in".format(command))
+        log(command)
         subprocess.Popen(command)
 
     def set_interpreter(self, index):

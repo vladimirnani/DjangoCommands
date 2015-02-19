@@ -67,6 +67,7 @@ Currently supports following commands:
  * `Django: Terminal Here`
  * `Django: Pip Freeze`
  * `Django: Pip Freeze To File`
+ * `Django: Pip Install Requirements`
 
 ### Settings
 
@@ -76,9 +77,12 @@ Currently supports following commands:
  * `server_host`: host for the runserver command
  * `server_port`: port for the server to listen
  * `linux_terminal: Only Linux setting for command line emulator`
-*_it's important to set your envs directories_ *
+
+ __It's important to set your envs directories__
+
+ __Check that your 'linux_terminal' setting uses an underscore "_"__
 
 #### Please report any issue, bug, enhacement or comment [here](https://github.com/vladimirnani/DjangoCommands/issues) 
-#### I'll be glad to read your feedbacks
+#### We'll be glad to read and work on all of them
 
 
