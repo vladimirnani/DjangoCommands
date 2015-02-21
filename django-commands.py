@@ -350,6 +350,7 @@ class PipInstallRequirementsCommand(VirtualEnvCommand):
         super(PipInstallRequirementsCommand, self).run()
 
     def run(self):
+        self.extra_args = ['install', '-r']
         if os.path.exists(self.file_name):
             self.extra_args.append(self.file_name)
             super(PipInstallRequirementsCommand, self).run()
