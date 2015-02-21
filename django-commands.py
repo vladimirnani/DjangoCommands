@@ -21,10 +21,10 @@ def log(message):
 
 
 class DjangoCommand(sublime_plugin.WindowCommand):
+    project_true = True
 
     def __init__(self, *args, **kwargs):
         self.settings = sublime.load_settings(SETTINGS_FILE)
-        self.projectFlag = False
         self.interpreter_versions = {2: "python2",
                                      3: "python3"} if PLATFORM is not "Windows" else {2: "python", 3: "python"}
         sublime_plugin.WindowCommand.__init__(self, *args, **kwargs)
@@ -33,20 +33,22 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         return self.settings.get('django_project_root')or self.find_manage_py()
 
     def get_executable(self):
-
+        self.project_true = self.settings.get('project_override')
+        settings_interpreter = self.settings.get('python_bin')
         project = self.window.project_data()
         settings_exists = 'settings' in project.keys()
-        if settings_exists:
+        if settings_exists and self.project_true:
             project_interpreter = project['settings'].get('python_interpreter')
-            if project_interpreter is not None:
-                caption = "Want to use project interpreter?"
-                self.projectFlag = sublime.ok_cancel_dialog(caption, "Yes")
-            if self.projectFlag is True:
-                self.settings.set("python_bin", project_interpreter)
+            if project_interpreter is not None and self.project_true is True:
+                self.settings.set('python_bin', project_interpreter)
                 return project_interpreter
+            elif project_interpreter is not None and self.project_true is False:
+                return settings_interpreter
             else:
                 version = self.settings.get("python_version")
                 return shutil.which(self.interpreter_versions[version])
+        elif settings_interpreter is not None:
+            return settings_interpreter
         else:
             version = self.settings.get("python_version")
             return shutil.which(self.interpreter_versions[version])
@@ -71,9 +73,7 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         os.chdir(base_dir)
 
     def format_command(self, command):
-        binary = self.settings.get('python_bin')
-        if binary is None:
-            binary = self.get_executable()
+        binary = self.get_executable()
         self.manage_py = self.get_manage_py()
         self.go_to_project_home()
 
