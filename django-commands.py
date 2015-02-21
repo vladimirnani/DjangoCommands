@@ -497,9 +497,25 @@ class WriteHelperCommand(sublime_plugin.TextCommand):
 
 class DjangoNewProjectCommand(SetVirtualEnvCommand):
 
-    def create_project(self, name):
+    def folder_selected(self, index):
+        self.create_project(directory=self.window.folders()[index])
+
+    def check_folders(self, name):
+        if len(self.window.folders()) == 1:
+            self.create_project(name=name, directory=self.window.folders()[0])
+        else:
+            self.name = name
+            self.window.show_quick_panel(self.window.folders(), self.folder_selected)
+
+    def create_project(self, **kwargs):
+        name = kwargs.get('name')
+        directory = kwargs.get('directory')
+        if name is not None:
+            pass
+        else:
+            name = self.name
         order = os.path.join(os.path.abspath(os.path.dirname(self.interpreter)), "django-admin.py")
-        command = [self.interpreter, order, "startproject", name, self.window.folders()[0]]
+        command = [self.interpreter, order, "startproject", name, directory]
         log(command)
         subprocess.Popen(command)
 
@@ -509,7 +525,7 @@ class DjangoNewProjectCommand(SetVirtualEnvCommand):
         name, self.interpreter = self.choices[index]
         if name is not "default":
             self.interpreter = os.path.join(self.interpreter, 'python')
-        self.window.show_input_panel("Project name", "", self.create_project, None, None)
+        self.window.show_input_panel("Project name", "", self.check_folders, None, None)
 
     def run(self):
         venv_paths = self.settings.get("python_virtualenv_paths", [])
