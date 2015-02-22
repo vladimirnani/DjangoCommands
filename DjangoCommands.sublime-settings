@@ -16,8 +16,6 @@
     // Run server in port
     "server_port": "8000",
     // Linux only: terminal emulator, not everyone has gnome-terminal
-    "linux_terminal": "gnome-terminal",
-    // Per project setting "python_interpreter" overrides "python_bin"
-    "project_override": true
+    "linux_terminal": "gnome-terminal"
 
 }
