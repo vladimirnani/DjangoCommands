@@ -1,4 +1,4 @@
-# DjangoCommands for ST2/ST3
+# DjangoCommands for ST2
 
 ###The best tool for your django development.
 
@@ -77,7 +77,6 @@ Currently supports following commands:
  * `server_host`: host for the runserver command
  * `server_port`: port for the server to listen
  * `linux_terminal`: Only Linux setting for command line emulator
- * `project_override`: (Boolean) Per project setting "python_interpreter" overrides "python_bin"
 
  __It's important to set your envs directories__
 
