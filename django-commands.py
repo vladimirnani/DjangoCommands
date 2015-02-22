@@ -5,11 +5,10 @@ import subprocess
 import os
 import glob
 import platform
-import shutil
 import re
 
 from functools import partial
-from collections import OrderedDict
+import collections
 
 SETTINGS_FILE = 'DjangoCommands.sublime-settings'
 PLATFORM = platform.system()
@@ -17,11 +16,16 @@ TERMINAL = ''
 
 
 def log(message):
-    print(' - Django: {0}'.format(message))
+    print(' - Django: %s' % message)
 
+def which(pgm):
+    path=os.getenv('PATH')
+    for p in path.split(os.path.pathsep):
+        p=os.path.join(p,pgm)
+        if os.path.exists(p) and os.access(p,os.X_OK):
+            return p
 
 class DjangoCommand(sublime_plugin.WindowCommand):
-    project_true = True
 
     def __init__(self, *args, **kwargs):
         self.settings = sublime.load_settings(SETTINGS_FILE)
@@ -33,25 +37,12 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         return self.settings.get('django_project_root')or self.find_manage_py()
 
     def get_executable(self):
-        self.project_true = self.settings.get('project_override')
         settings_interpreter = self.settings.get('python_bin')
-        project = self.window.project_data()
-        settings_exists = 'settings' in project.keys()
-        if settings_exists and self.project_true:
-            project_interpreter = project['settings'].get('python_interpreter')
-            if project_interpreter is not None and self.project_true is True:
-                self.settings.set('python_bin', project_interpreter)
-                return project_interpreter
-            elif project_interpreter is not None and self.project_true is False:
-                return settings_interpreter
-            else:
-                version = self.settings.get("python_version")
-                return shutil.which(self.interpreter_versions[version])
-        elif settings_interpreter is not None:
-            return settings_interpreter
+        if settings_interpreter is not None:
+            return settings_interpreterx
         else:
             version = self.settings.get("python_version")
-            return shutil.which(self.interpreter_versions[version])
+            return which(self.interpreter_versions[version])
 
     def find_manage_py(self):
         for path in sublime.active_window().folders():
@@ -77,7 +68,7 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         self.manage_py = self.get_manage_py()
         self.go_to_project_home()
 
-        command = "{} {} {}".format(binary, self.manage_py, command)
+        command = "{bin} {manage} {command}".format(bin=binary, manage=self.manage_py, command=command)
         return command
 
     def run_command(self, command):
@@ -98,17 +89,17 @@ class CommandThread(threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
-        command = "{}".format(self.command)
+        command = "{command}".format(command=self.command)
         env = os.environ.copy()
         if PLATFORM == 'Windows':
             command = [
                 'cmd.exe',
-                '/k', "{} && timeout /T 10 && exit".format(command)
+                '/k', "{command} && timeout /T 10 && exit".format(command=command)
             ]
         if PLATFORM == 'Linux':
             command = [
                 TERMINAL,
-                '-e', 'bash -c \"{0}; read line\"'.format(command)
+                '-e', 'bash -c \"{command}; read line\"'.format(command=command)
             ]
         if PLATFORM == 'Darwin':
             command = [
@@ -117,10 +108,10 @@ class CommandThread(threading.Thread):
                 '-e', 'tell application "System Events" to tell process \
                 "Terminal" to keystroke "t" using command down',
                 '-e', 'tell application "Terminal" to \
-                do script "{0}" in front window'.format(command)
+                do script "{command}" in front window'.format(command=command)
             ]
 
-        log('Command is : {0}'.format(str(command)))
+        log('Command is : {command}'.format(command=str(command)))
         subprocess.Popen(command, env=env)
 
 
@@ -129,7 +120,7 @@ class DjangoSimpleCommand(DjangoCommand):
     extra_args = []
 
     def get_command(self):
-        return "{} {}".format(self.command, " ".join(self.extra_args))
+        return "{command} {extra_args}".format(command=self.command, extra_args=" ".join(self.extra_args))
 
     def run(self):
         command = self.get_command()
@@ -163,9 +154,9 @@ class DjangoAppCommand(DjangoCommand):
             return
         name = apps[index]
         self.run_command(
-            "{} {} {}".format(self.command,
-                              "".join(name),
-                              " ".join(self.extra_args)))
+            "{command} {name} {extra_args}".format(command=self.command,
+                              name="".join(name),
+                              extra_args=" ".join(self.extra_args)))
 
     def run(self):
         self.go_to_project_home()
@@ -204,7 +195,7 @@ class DjangoRunCommand(DjangoSimpleCommand):
         port = self.settings.get('server_port')
         host = self.settings.get('server_host')
         self.extra_args = [host, port]
-        inComannd = "{} {}:{}".format(self.command, host, port)
+        inComannd = "{command} {host}:{port}".format(command=self.command, host=host, port=port)
         self.run_command(inComannd)
 
 
@@ -300,8 +291,8 @@ class VirtualEnvCommand(DjangoCommand):
         self.manage_py = self.get_manage_py()
         self.go_to_project_home()
         bin_dir = os.path.dirname(self.settings.get('python_bin'))
-        command = "{} {}".format(
-            os.path.join(bin_dir, self.command), " ".join(self.extra_args))
+        command = "{dir} {extra_args}".format(
+            dir=os.path.join(bin_dir, self.command), extra_args=" ".join(self.extra_args))
         thread = CommandThread(command)
         thread.start()
 
@@ -314,11 +305,11 @@ class TerminalHereCommand(VirtualEnvCommand):
         self.go_to_project_home()
         bin_dir = os.path.dirname(self.settings.get('python_bin'))
         if PLATFORM == 'Windows':
-            command = 'cmd /k {}'.format(
-                os.path.join(bin_dir, self.command))
+            command = 'cmd /k {command}'.format(
+                command=os.path.join(bin_dir, self.command))
         if PLATFORM == 'Linux' or PLATFORM == 'Darwin':
-            command = "bash --rcfile <(echo '. ~/.bashrc && . {}')".format(
-                os.path.join(bin_dir, self.command))
+            command = "bash --rcfile <(echo '. ~/.bashrc && . {command}')".format(
+                command=os.path.join(bin_dir, self.command))
         thread = CommandThread(command)
         thread.start()
 
@@ -477,8 +468,8 @@ urlpatterns = patterns('',
 
 # Create your tests here.
 """
-        # actions = OrderedDict((name, eval(name)) for name in self.options)
-        actions = OrderedDict()
+        # actions = collections.OrderedDict((name, eval(name)) for name in self.options)
+        actions = collections.OrderedDict()
         for option in self.options:
             actions[option] = eval(option)
         text = actions[self.options[index]]
@@ -532,6 +523,6 @@ class DjangoNewProjectCommand(SetVirtualEnvCommand):
         version = self.settings.get("python_version")
         envs = self.find_virtualenvs(venv_paths)
         self.choices = [[path.split(os.path.sep)[-2], path] for path in envs]
-        self.choices.append(["default", shutil.which(self.interpreter_versions[version])])
+        self.choices.append(["default", which(self.interpreter_versions[version])])
         sublime.message_dialog("Select a python interpreter for the new project")
         self.window.show_quick_panel(self.choices, self.set_interpreter)
