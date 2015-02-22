@@ -1,4 +1,4 @@
-# DjangoCommands for ST2/ST3
+# DjangoCommands for ST3
 
 ###The best tool for your django development.
 
