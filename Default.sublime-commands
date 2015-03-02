@@ -1,5 +1,9 @@
 [
     {
+        "caption": "Django: New Project",
+        "command": "django_new_project"
+    },
+    {
         "caption": "Django: Run Server",
         "command": "django_run"
     },
@@ -44,12 +48,24 @@
         "command": "pip_freeze_to_file"
     },
     {
+        "caption": "Django: Pip install Requirements",
+        "command": "pip_install_requirements"
+    },
+    {
         "caption": "Django: Test",
         "command": "django_test_app"
     },
     {
         "caption": "Django: Test All",
         "command": "django_test_all"
+    },
+    {
+        "caption": "Django: Open Docs",
+        "command": "django_open_docs"
+    },
+    {
+        "caption": "Django: Search in Docs",
+        "command": "django_search_docs"
     },
     {
         "caption": "Django: Shell",

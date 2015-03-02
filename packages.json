@@ -1,0 +1,19 @@
+{
+  "schema_version": "3.0",
+  "packages": [
+    {
+      "name": "Django Manage Commands",
+      "details": "https://github.com/vladimirnani/DjangoCommands",
+      "releases": [
+        {
+          "sublime_text": "<3000",
+          "details": "https://github.com/Proyecto513/DjangoCommands/tree/st2"
+        },
+        {
+          "sublime_text": ">=3000",
+          "details": "https://github.com/vladimirnani/DjangoCommands/tree/master"
+        }
+      ]
+    }
+  ]
+}

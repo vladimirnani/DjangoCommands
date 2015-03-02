@@ -10,9 +10,11 @@ import re
 
 from functools import partial
 from collections import OrderedDict
+from urllib.parse import urlencode
 
 SETTINGS_FILE = 'DjangoCommands.sublime-settings'
 PLATFORM = platform.system()
+LATEST_DJANGO_RELEASE = 1.7
 TERMINAL = ''
 
 
@@ -21,34 +23,46 @@ def log(message):
 
 
 class DjangoCommand(sublime_plugin.WindowCommand):
+    project_true = True
 
     def __init__(self, *args, **kwargs):
         self.settings = sublime.load_settings(SETTINGS_FILE)
-        self.projectFlag = False
-        self.interpreter_versions = {2: "python2", 3: "python3"}
+        self.interpreter_versions = {2: "python2",
+                                     3: "python3"} if PLATFORM is not "Windows" else {2: "python", 3: "python"}
         sublime_plugin.WindowCommand.__init__(self, *args, **kwargs)
 
     def get_manage_py(self):
         return self.settings.get('django_project_root')or self.find_manage_py()
 
     def get_executable(self):
-
+        self.project_true = self.settings.get('project_override')
+        settings_interpreter = self.settings.get('python_bin')
         project = self.window.project_data()
         settings_exists = 'settings' in project.keys()
-        if settings_exists:
+        if settings_exists and self.project_true:
             project_interpreter = project['settings'].get('python_interpreter')
-            if project_interpreter is not None:
-                caption = "Want to use project interpreter?"
-                self.projectFlag = sublime.ok_cancel_dialog(caption, "Yes")
-            if self.projectFlag is True:
-                self.settings.set("python_bin", project_interpreter)
+            if project_interpreter is not None and self.project_true is True:
+                self.settings.set('python_bin', project_interpreter)
                 return project_interpreter
+            elif project_interpreter is not None and self.project_true is False:
+                return settings_interpreter
             else:
                 version = self.settings.get("python_version")
                 return shutil.which(self.interpreter_versions[version])
+        elif settings_interpreter is not None:
+            return settings_interpreter
         else:
             version = self.settings.get("python_version")
             return shutil.which(self.interpreter_versions[version])
+
+    def get_version(self):
+        binary = self.get_executable()
+        command = [binary, '-c', 'import django;print(django.get_version())']
+        output = subprocess.check_output(command)
+        version = re.match(r'(\d\.\d)', output.decode('utf-8')).group(0)
+        if float(version) > LATEST_DJANGO_RELEASE:
+            version = 'dev'
+        return version
 
     def find_manage_py(self):
         for path in sublime.active_window().folders():
@@ -70,9 +84,7 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         os.chdir(base_dir)
 
     def format_command(self, command):
-        binary = self.settings.get('python_bin')
-        if binary is None:
-            binary = self.get_executable()
+        binary = self.get_executable()
         self.manage_py = self.get_manage_py()
         self.go_to_project_home()
 
@@ -83,6 +95,8 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         global TERMINAL
         if PLATFORM == "Linux":
             TERMINAL = self.settings.get('linux_terminal')
+            if TERMINAL is None:
+                TERMINAL = self.settings.get('linux-terminal', 'gnome-terminal')
         command = self.format_command(command)
         thread = CommandThread(command)
         thread.start()
@@ -339,6 +353,25 @@ class PipFreezeToFileCommand(VirtualEnvCommand):
             "File name", "requirements.txt", self.on_done, None, None)
 
 
+class PipInstallRequirementsCommand(VirtualEnvCommand):
+    command = 'pip'
+    extra_args = ['install', '-r']
+    file_name = 'requirements.txt'
+
+    def another_file(self, text):
+        self.extra_args.append(text)
+        super(PipInstallRequirementsCommand, self).run()
+
+    def run(self):
+        self.extra_args = ['install', '-r']
+        if os.path.exists(self.file_name):
+            self.extra_args.append(self.file_name)
+            super(PipInstallRequirementsCommand, self).run()
+        else:
+            sublime.message_dialog('requirements.txt not found')
+            self.window.show_input_panel('File to install', self.another_file, None, None)
+
+
 class SetVirtualEnvCommand(VirtualEnvCommand):
 
     def is_enabled(self):
@@ -470,5 +503,67 @@ urlpatterns = patterns('',
 class WriteHelperCommand(sublime_plugin.TextCommand):
 
     def run(self, edit, text):
-        print("text")
         self.view.insert(edit, 0, text)
+
+
+class DjangoNewProjectCommand(SetVirtualEnvCommand):
+
+    def folder_selected(self, index):
+        self.create_project(directory=self.window.folders()[index])
+
+    def check_folders(self, name):
+        if len(self.window.folders()) == 1:
+            self.create_project(name=name, directory=self.window.folders()[0])
+        else:
+            self.name = name
+            self.window.show_quick_panel(self.window.folders(), self.folder_selected)
+
+    def create_project(self, **kwargs):
+        name = kwargs.get('name')
+        directory = kwargs.get('directory')
+        if name is not None:
+            pass
+        else:
+            name = self.name
+        order = os.path.join(os.path.abspath(os.path.dirname(self.interpreter)), "django-admin.py")
+        command = [self.interpreter, order, "startproject", name, directory]
+        log(command)
+        subprocess.Popen(command)
+
+    def set_interpreter(self, index):
+        if index == -1:
+            return
+        name, self.interpreter = self.choices[index]
+        if name is not "default":
+            self.interpreter = os.path.join(self.interpreter, 'python')
+        self.window.show_input_panel("Project name", "", self.check_folders, None, None)
+
+    def run(self):
+        venv_paths = self.settings.get("python_virtualenv_paths", [])
+        version = self.settings.get("python_version")
+        envs = self.find_virtualenvs(venv_paths)
+        self.choices = [[path.split(os.path.sep)[-2], path] for path in envs]
+        self.choices.append(["default", shutil.which(self.interpreter_versions[version])])
+        sublime.message_dialog("Select a python interpreter for the new project")
+        self.window.show_quick_panel(self.choices, self.set_interpreter)
+
+
+class DjangoOpenDocsCommand(DjangoCommand):
+
+    def run(self):
+        version = self.get_version()
+        url = "https://docs.djangoproject.com/en/{}/".format(version)
+        self.window.run_command('open_url', {'url': url})
+
+
+class DjangoSearchDocsCommand(DjangoCommand):
+
+    def on_done(self, text):
+        releases = {'1.3': 5, '1.4': 6, '1.5': 7, '1.6': 9, '1.7': 11, '1.8': 13, 'dev': 1}
+        release = releases[self.get_version()]
+        params = {'q': text, 'release': release}
+        url = "https://docs.djangoproject.com/search/?{}".format(urlencode(params))
+        self.window.run_command('open_url', {'url': url})
+
+    def run(self):
+        self.window.show_input_panel('Search:', '', self.on_done, None, None)
