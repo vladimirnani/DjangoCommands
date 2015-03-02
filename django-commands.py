@@ -55,6 +55,15 @@ class DjangoCommand(sublime_plugin.WindowCommand):
             version = self.settings.get("python_version")
             return shutil.which(self.interpreter_versions[version])
 
+    def get_version(self):
+        binary = self.get_executable()
+        command = [binary, '-c', 'import django;print(django.get_version())']
+        output = subprocess.check_output(command)
+        version = re.match(r'(\d\.\d)', output.decode('utf-8')).group(0)
+        if float(version) > LATEST_DJANGO_RELEASE:
+            version = 'dev'
+        return version
+
     def find_manage_py(self):
         for path in sublime.active_window().folders():
             for root, dirs, files in os.walk(path):
@@ -541,22 +550,13 @@ class DjangoNewProjectCommand(SetVirtualEnvCommand):
 
 class DjangoOpenDocsCommand(DjangoCommand):
 
-    def get_version(self):
-        binary = self.get_executable()
-        command = [binary, '-c', 'import django;print(django.get_version())']
-        output = subprocess.check_output(command)
-        version = re.match(r'(\d\.\d)', output.decode('utf-8')).group(0)
-        if float(version) > LATEST_DJANGO_RELEASE:
-            version = 'dev'
-        return version
-
     def run(self):
         version = self.get_version()
         url = "https://docs.djangoproject.com/en/{}/".format(version)
         self.window.run_command('open_url', {'url': url})
 
 
-class DjangoSearchDocsCommand(DjangoOpenDocsCommand):
+class DjangoSearchDocsCommand(DjangoCommand):
 
     def on_done(self, text):
         releases = {'1.3': 5, '1.4': 6, '1.5': 7, '1.6': 9, '1.7': 11, '1.8': 13, 'dev': 1}
