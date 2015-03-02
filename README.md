@@ -18,6 +18,7 @@ Everything tested and running!
 * __Virtualenv support__
 * __Django boilerplate__
 * __Install your dependencies__
+* __Open and search in django documentation from the editor__
 * __Create new projects from ST__
 * __South support__
 
@@ -53,6 +54,8 @@ Currently supports following commands:
  * `Django: Other Command`
  * `Django: Check`
  * `Django: Help`
+ * `Django: Open Docs`
+ * `Django: Search in Docs`
  * `Django: Use Default Interpreter`
  * `Django: Make Migration`
  * `Django: SQLMigration` 

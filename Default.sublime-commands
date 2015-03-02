@@ -60,6 +60,14 @@
         "command": "django_test_all"
     },
     {
+        "caption": "Django: Open Docs",
+        "command": "django_open_docs"
+    },
+    {
+        "caption": "Django: Search in Docs",
+        "command": "django_search_docs"
+    },
+    {
         "caption": "Django: Shell",
         "command": "django_shell"
     },

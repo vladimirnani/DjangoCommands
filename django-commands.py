@@ -10,9 +10,11 @@ import re
 
 from functools import partial
 from collections import OrderedDict
+from urllib.parse import urlencode
 
 SETTINGS_FILE = 'DjangoCommands.sublime-settings'
 PLATFORM = platform.system()
+LATEST_DJANGO_RELEASE = 1.7
 TERMINAL = ''
 
 
@@ -535,3 +537,32 @@ class DjangoNewProjectCommand(SetVirtualEnvCommand):
         self.choices.append(["default", shutil.which(self.interpreter_versions[version])])
         sublime.message_dialog("Select a python interpreter for the new project")
         self.window.show_quick_panel(self.choices, self.set_interpreter)
+
+
+class DjangoOpenDocsCommand(DjangoCommand):
+
+    def get_version(self):
+        binary = self.get_executable()
+        output = subprocess.check_output('{} -c "import django;print(django.get_version())"'.format(binary))
+        version = version = re.match(r'(\d\.\d)', output.decode('utf-8')).group(0)
+        if float(version) > LATEST_DJANGO_RELEASE:
+            version = 'dev'
+        return version
+
+    def run(self):
+        version = self.get_version()
+        url = "https://docs.djangoproject.com/en/{}/".format(version)
+        self.window.run_command('open_url', {'url': url})
+
+
+class DjangoSearchDocsCommand(DjangoOpenDocsCommand):
+
+    def on_done(self, text):
+        releases = {'1.3': 5, '1.4': 6, '1.5': 7, '1.6': 9, '1.7': 11, '1.8': 13, 'dev': 1}
+        release = releases[self.get_version()]
+        params = {'q': text, 'release': release}
+        url = "https://docs.djangoproject.com/search/?{}".format(urlencode(params))
+        self.window.run_command('open_url', {'url': url})
+
+    def run(self):
+        self.window.show_input_panel('Search:', '', self.on_done, None, None)
