@@ -42,7 +42,6 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         if settings_exists and self.project_true:
             project_interpreter = project['settings'].get('python_interpreter')
             if project_interpreter is not None and self.project_true is True:
-                self.settings.set('python_bin', project_interpreter)
                 return project_interpreter
             elif project_interpreter is not None and self.project_true is False:
                 return settings_interpreter
