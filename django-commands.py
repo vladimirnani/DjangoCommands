@@ -543,8 +543,9 @@ class DjangoOpenDocsCommand(DjangoCommand):
 
     def get_version(self):
         binary = self.get_executable()
-        output = subprocess.check_output('{} -c "import django;print(django.get_version())"'.format(binary))
-        version = version = re.match(r'(\d\.\d)', output.decode('utf-8')).group(0)
+        command = [binary, '-c', 'import django;print(django.get_version())']
+        output = subprocess.check_output(command)
+        version = re.match(r'(\d\.\d)', output.decode('utf-8')).group(0)
         if float(version) > LATEST_DJANGO_RELEASE:
             version = 'dev'
         return version
