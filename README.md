@@ -84,7 +84,7 @@ Currently supports following commands:
 
  __It's important to set your envs directories__
 
- __Check that your 'linux_terminal' setting uses an underscore "_"__
+ __Check that your 'linux\_terminal' setting uses an underscore "\_"__
 
 #### Please report any issue, bug, enhacement or comment [here](https://github.com/vladimirnani/DjangoCommands/issues) 
 #### We'll be glad to read and work on all of them
