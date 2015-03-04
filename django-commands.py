@@ -18,12 +18,14 @@ TERMINAL = ''
 def log(message):
     print(' - Django: %s' % message)
 
+
 def which(pgm):
-    path=os.getenv('PATH')
+    path = os.getenv('PATH')
     for p in path.split(os.path.pathsep):
-        p=os.path.join(p,pgm)
-        if os.path.exists(p) and os.access(p,os.X_OK):
+        p = os.path.join(p, pgm)
+        if os.path.exists(p) and os.access(p, os.X_OK):
             return p
+
 
 class DjangoCommand(sublime_plugin.WindowCommand):
 
@@ -39,7 +41,7 @@ class DjangoCommand(sublime_plugin.WindowCommand):
     def get_executable(self):
         settings_interpreter = self.settings.get('python_bin')
         if settings_interpreter is not None:
-            return settings_interpreterx
+            return settings_interpreter
         else:
             version = self.settings.get("python_version")
             return which(self.interpreter_versions[version])
@@ -155,8 +157,8 @@ class DjangoAppCommand(DjangoCommand):
         name = apps[index]
         self.run_command(
             "{command} {name} {extra_args}".format(command=self.command,
-                              name="".join(name),
-                              extra_args=" ".join(self.extra_args)))
+                                                   name="".join(name),
+                                                   extra_args=" ".join(self.extra_args)))
 
     def run(self):
         self.go_to_project_home()
