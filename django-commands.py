@@ -329,6 +329,11 @@ class TerminalHereCommand(VirtualEnvCommand):
         if PLATFORM == 'Linux' or PLATFORM == 'Darwin':
             command = "bash --rcfile <(echo '. ~/.bashrc && . {}')".format(
                 os.path.join(bin_dir, self.command))
+        global TERMINAL
+        if PLATFORM == "Linux":
+            TERMINAL = self.settings.get('linux_terminal')
+            if TERMINAL is None:
+                TERMINAL = self.settings.get('linux-terminal', 'gnome-terminal')
         thread = CommandThread(command)
         thread.start()
 

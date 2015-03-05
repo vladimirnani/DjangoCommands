@@ -6,7 +6,7 @@
             "details": "https://github.com/vladimirnani/DjangoCommands",
             "description": "This tool is a Sublime Text wrapper around django manage.py commands.",
             "readme": "https://raw.github.com/vladimirnani/DjangoCommands/master/README.md",
-            "labels": ["Django", "Commands", "Tools", "wrapper", "web development"],
+            "labels": ["Django", "Commands", "Tools", "wrapper", "web development", "python"],
             "releases": [
                 {
                     "sublime_text": "<3000",
