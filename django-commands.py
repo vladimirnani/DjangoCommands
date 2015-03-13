@@ -4,6 +4,7 @@ import threading
 import subprocess
 import os
 import glob
+import ntpath
 import platform
 import shutil
 import re
@@ -29,6 +30,7 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         self.settings = sublime.load_settings(SETTINGS_FILE)
         self.interpreter_versions = {2: "python2",
                                      3: "python3"} if PLATFORM is not "Windows" else {2: "python", 3: "python"}
+        log("{} ready".format(self.__class__.__name__))
         sublime_plugin.WindowCommand.__init__(self, *args, **kwargs)
 
     def get_manage_py(self):
@@ -277,13 +279,35 @@ class DjangoListMigrationsCommand(DjangoSimpleCommand):
 class DjangoSqlMigrationCommand(DjangoAppCommand):
     command = 'sqlmigrate'
 
-    def set_migration_name(self, name):
-        self.extra_args = [name]
-        DjangoAppCommand.run(self)
+    def path_leaf(self, path):
+        head, tail = ntpath.split(path)
+        return os.path.splitext(tail)[0] or os.path.splitext(ntpath.basename(head))[0]
+
+    def is_enabled(self):
+        return float(self.get_version()) >= 1.7 or self.get_version == 'dev'
+
+    def on_choose_migration(self, apps, index):
+        if index == -1:
+            return
+        self.extra_args.append(apps[index])
+        self.run_command(
+            "{} {} {}".format(self.command, self.name, " ".join(self.extra_args)))
+
+    def on_app_selected(self, apps, index):
+        self.name = apps[index]
+        path = os.path.join(os.path.dirname(self.find_apps()[index]), 'migrations')
+        migrations = [path for path in map(self.path_leaf, glob.iglob(os.path.join(path, r'*.py')))]
+        migrations.remove('__init__')
+        sublime.set_timeout(lambda: self.choose(migrations, self.on_choose_migration), 20)
 
     def run(self):
-        self.window.show_input_panel(
-            "Migration name", "", self.set_migration_name, None, None)
+        self.extra_args = []
+        self.go_to_project_home()
+        choices = self.find_apps()
+        self.manage_py = self.get_manage_py()
+        base_dir = os.path.dirname(self.manage_py)
+        choices = [self.prettify(path, base_dir) for path in choices]
+        self.choose(choices, self.on_app_selected)
 
 
 class DjangoCustomCommand(DjangoCommand):
@@ -492,7 +516,6 @@ urlpatterns = patterns('',
 
 # Create your tests here.
 """
-        # actions = OrderedDict((name, eval(name)) for name in self.options)
         actions = OrderedDict()
         for option in self.options:
             actions[option] = eval(option)
