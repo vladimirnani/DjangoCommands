@@ -92,12 +92,15 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         command = "{} {} {}".format(binary, self.manage_py, command)
         return command
 
-    def run_command(self, command):
+    def define_terminal(self):
         global TERMINAL
         if PLATFORM == "Linux":
             TERMINAL = self.settings.get('linux_terminal')
             if TERMINAL is None:
                 TERMINAL = self.settings.get('linux-terminal', 'gnome-terminal')
+
+    def run_command(self, command):
+        self.define_terminal()
         command = self.format_command(command)
         thread = CommandThread(command)
         thread.start()
@@ -573,6 +576,18 @@ class DjangoNewProjectCommand(SetVirtualEnvCommand):
         self.choices.append(["default", shutil.which(self.interpreter_versions[version])])
         sublime.message_dialog("Select a python interpreter for the new project")
         self.window.show_quick_panel(self.choices, self.set_interpreter)
+
+
+class DjangoNewAppCommand(DjangoSimpleCommand):
+    command = 'startapp'
+
+    def create_app(self, text):
+        self.extra_args.append(text)
+        command = self.format_command(self.get_command())
+        subprocess.Popen(command.split(' '), env=os.environ.copy())
+
+    def run(self):
+        self.window.show_input_panel("App name", '', self.create_app, None, None)
 
 
 class DjangoOpenDocsCommand(DjangoCommand):

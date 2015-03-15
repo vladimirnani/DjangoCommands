@@ -2,11 +2,14 @@
   {
     "keys": ["ctrl+enter"]
     , "command": "django_click"
-    , "context": { "key": "selector", "operator": "equal", "operand": "text.html.django" }
+    , "context": [{ "key": "selector", "operator": "equal", "operand": "text.html.django" }]
   },
   {
     "keys": ["ctrl+alt+r"]
     , "command": "django_run"
-    , "context": { "key": "selector", "operator": "equal", "operand": "text.html.django" }
-  }
+    , "context": [{ "key": "selector", "operator": "equal", "operand": "text.html.django" }]
+  },
+  { "keys": ["ctrl+d", "ctrl+a"]
+  , "command": "show_overlay"
+  , "args": {"overlay": "command_palette", "text": "Django:"} },
 ]

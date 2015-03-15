@@ -4,6 +4,10 @@
         "command": "django_new_project"
     },
     {
+        "caption": "Django: New App",
+        "command": "django_new_app"
+    },
+    {
         "caption": "Django: Run Server",
         "command": "django_run"
     },
