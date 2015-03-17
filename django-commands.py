@@ -347,6 +347,7 @@ class TerminalHereCommand(VirtualEnvCommand):
     command = 'activate'
 
     def run(self):
+        self.define_terminal()
         self.manage_py = self.get_manage_py()
         self.go_to_project_home()
         bin_dir = os.path.dirname(self.settings.get('python_bin'))
@@ -356,11 +357,6 @@ class TerminalHereCommand(VirtualEnvCommand):
         if PLATFORM == 'Linux' or PLATFORM == 'Darwin':
             command = "bash --rcfile <(echo '. ~/.bashrc && . {}')".format(
                 os.path.join(bin_dir, self.command))
-        global TERMINAL
-        if PLATFORM == "Linux":
-            TERMINAL = self.settings.get('linux_terminal')
-            if TERMINAL is None:
-                TERMINAL = self.settings.get('linux-terminal', 'gnome-terminal')
         thread = CommandThread(command)
         thread.start()
 

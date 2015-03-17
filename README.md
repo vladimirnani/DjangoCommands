@@ -20,6 +20,7 @@ Everything tested and running!
 * __Install your dependencies__
 * __Open and search in django documentation from the editor__
 * __Create new projects from ST__
+* __Start new apps__
 * __South support__
 
 
@@ -43,6 +44,7 @@ Currently supports following commands:
 
 #### Django:
  * `Django: New Project`
+ * `Django: New App`
  * `Django: Run Server`
  * `Django: Boilerplate`
  * `Django: Sync Database`
