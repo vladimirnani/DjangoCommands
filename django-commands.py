@@ -476,13 +476,18 @@ class DjangoClickCommand(sublime_plugin.TextCommand):
                     separator=os.path.sep), 1)
 
             for one in targets:
-                # get the target file path
                 tar = os.path.join(base, self.TEMPLATE_DIR, one)
-
-                # open it!
-                window = sublime.active_window()
-                window.open_file(tar, sublime.ENCODED_POSITION)
-
+                if os.path.isfile(tar):
+                    window = sublime.active_window()
+                    window.open_file(tar, sublime.ENCODED_POSITION)
+                else:
+                    for root, dirs, filenames in os.walk(base):
+                        for f in filenames:
+                            if f == one:
+                                tar = os.path.join(root, one)
+                                window = sublime.active_window()
+                                if os.path.exists(tar):
+                                    window.open_file(tar, sublime.ENCODED_POSITION)
 
 class DjangoBoilerPlate(sublime_plugin.WindowCommand):
     options = ['urls', 'models', 'views', 'admin', 'forms', 'tests']
