@@ -59,7 +59,14 @@ class DjangoCommand(sublime_plugin.WindowCommand):
     def get_version(self):
         binary = self.get_executable()
         command = [binary, '-c', 'import django;print(django.get_version())']
-        output = subprocess.check_output(command)
+
+        # Hide the console window on Windows
+        startupinfo = None
+        if PLATFORM == 'Windows':
+            startupinfo = subprocess.STARTUPINFO()
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+
+        output = subprocess.check_output(command, startupinfo=startupinfo)
         version = re.match(r'(\d\.\d)', output.decode('utf-8')).group(0)
         if float(version) > LATEST_DJANGO_RELEASE:
             version = 'dev'
