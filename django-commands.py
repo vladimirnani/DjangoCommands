@@ -294,7 +294,7 @@ class DjangoSqlMigrationCommand(DjangoAppCommand):
         return os.path.splitext(tail)[0] or os.path.splitext(ntpath.basename(head))[0]
 
     def is_enabled(self):
-        return float(self.get_version()) >= 1.7 or self.get_version == 'dev'
+        return float(self.get_version()) >= 1.7 or self.get_version() == 'dev'
 
     def on_choose_migration(self, apps, index):
         if index == -1:
