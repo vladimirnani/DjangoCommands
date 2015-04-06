@@ -15,7 +15,7 @@ from urllib.parse import urlencode
 
 SETTINGS_FILE = 'DjangoCommands.sublime-settings'
 PLATFORM = platform.system()
-LATEST_DJANGO_RELEASE = 1.7
+LATEST_DJANGO_RELEASE = 1.8
 TERMINAL = ''
 
 
