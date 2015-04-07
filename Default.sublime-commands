@@ -56,6 +56,10 @@
         "command": "pip_install_requirements"
     },
     {
+        "caption": "Django: Pip Install Packages",
+        "command": "pip_install_packages"
+    },
+    {
         "caption": "Django: Test",
         "command": "django_test_app"
     },

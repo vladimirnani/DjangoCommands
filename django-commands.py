@@ -15,7 +15,7 @@ from urllib.parse import urlencode
 
 SETTINGS_FILE = 'DjangoCommands.sublime-settings'
 PLATFORM = platform.system()
-LATEST_DJANGO_RELEASE = 1.7
+LATEST_DJANGO_RELEASE = 1.8
 TERMINAL = ''
 
 
@@ -104,7 +104,8 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         if PLATFORM == "Linux":
             TERMINAL = self.settings.get('linux_terminal')
             if TERMINAL is None:
-                TERMINAL = self.settings.get('linux-terminal', 'gnome-terminal')
+                TERMINAL = self.settings.get(
+                    'linux-terminal', 'gnome-terminal')
 
     def run_command(self, command):
         self.define_terminal()
@@ -205,7 +206,8 @@ class DjangoOtherCommand(DjangoSimpleCommand):
         command = forSplit.split(' ')
         out = str(subprocess.check_output(command))
         out = re.search('b\'(.*)\'', out).group(1)
-        commands = out.split('\\n')[:-1] if PLATFORM is not "Windows" else out.split('\\r\\n')[:-1]
+        commands = out.split(
+            '\\n')[:-1] if PLATFORM is not "Windows" else out.split('\\r\\n')[:-1]
         return commands
 
     def on_choose_command(self, commands, index):
@@ -305,10 +307,13 @@ class DjangoSqlMigrationCommand(DjangoAppCommand):
 
     def on_app_selected(self, apps, index):
         self.name = apps[index]
-        path = os.path.join(os.path.dirname(self.find_apps()[index]), 'migrations')
-        migrations = [path for path in map(self.path_leaf, glob.iglob(os.path.join(path, r'*.py')))]
+        path = os.path.join(
+            os.path.dirname(self.find_apps()[index]), 'migrations')
+        migrations = [
+            path for path in map(self.path_leaf, glob.iglob(os.path.join(path, r'*.py')))]
         migrations.remove('__init__')
-        sublime.set_timeout(lambda: self.choose(migrations, self.on_choose_migration), 20)
+        sublime.set_timeout(
+            lambda: self.choose(migrations, self.on_choose_migration), 20)
 
     def run(self):
         self.extra_args = []
@@ -341,6 +346,7 @@ class VirtualEnvCommand(DjangoCommand):
         return self.settings.get('python_bin') is not None
 
     def run(self):
+        self.define_terminal()
         self.manage_py = self.get_manage_py()
         self.go_to_project_home()
         bin_dir = os.path.dirname(self.settings.get('python_bin'))
@@ -387,6 +393,19 @@ class PipFreezeToFileCommand(VirtualEnvCommand):
             "File name", "requirements.txt", self.on_done, None, None)
 
 
+class PipInstallPackagesCommand(VirtualEnvCommand):
+    command = 'pip'
+    extra_args = ['install']
+
+    def appendPackages(self, text):
+        self.extra_args.append(text)
+        super(PipInstallPackagesCommand, self).run()
+
+    def run(self):
+        self.window.show_input_panel(
+            'Packages', '', self.appendPackages, None, None)
+
+
 class PipInstallRequirementsCommand(VirtualEnvCommand):
     command = 'pip'
     extra_args = ['install', '-r']
@@ -403,7 +422,8 @@ class PipInstallRequirementsCommand(VirtualEnvCommand):
             super(PipInstallRequirementsCommand, self).run()
         else:
             sublime.message_dialog('requirements.txt not found')
-            self.window.show_input_panel('File to install', self.another_file, None, None)
+            self.window.show_input_panel(
+                'File to install', '', self.another_file, None, None)
 
 
 class SetVirtualEnvCommand(VirtualEnvCommand):
@@ -494,7 +514,9 @@ class DjangoClickCommand(sublime_plugin.TextCommand):
                                 tar = os.path.join(root, one)
                                 window = sublime.active_window()
                                 if os.path.exists(tar):
-                                    window.open_file(tar, sublime.ENCODED_POSITION)
+                                    window.open_file(
+                                        tar, sublime.ENCODED_POSITION)
+
 
 class DjangoBoilerPlate(sublime_plugin.WindowCommand):
     options = ['urls', 'models', 'views', 'admin', 'forms', 'tests']
@@ -554,7 +576,8 @@ class DjangoNewProjectCommand(SetVirtualEnvCommand):
             self.create_project(name=name, directory=self.window.folders()[0])
         else:
             self.name = name
-            self.window.show_quick_panel(self.window.folders(), self.folder_selected)
+            self.window.show_quick_panel(
+                self.window.folders(), self.folder_selected)
 
     def create_project(self, **kwargs):
         name = kwargs.get('name')
@@ -563,7 +586,8 @@ class DjangoNewProjectCommand(SetVirtualEnvCommand):
             pass
         else:
             name = self.name
-        order = os.path.join(os.path.abspath(os.path.dirname(self.interpreter)), "django-admin.py")
+        order = os.path.join(
+            os.path.abspath(os.path.dirname(self.interpreter)), "django-admin.py")
         command = [self.interpreter, order, "startproject", name, directory]
         log(command)
         subprocess.Popen(command)
@@ -574,15 +598,18 @@ class DjangoNewProjectCommand(SetVirtualEnvCommand):
         name, self.interpreter = self.choices[index]
         if name is not "default":
             self.interpreter = os.path.join(self.interpreter, 'python')
-        self.window.show_input_panel("Project name", "", self.check_folders, None, None)
+        self.window.show_input_panel(
+            "Project name", "", self.check_folders, None, None)
 
     def run(self):
         venv_paths = self.settings.get("python_virtualenv_paths", [])
         version = self.settings.get("python_version")
         envs = self.find_virtualenvs(venv_paths)
         self.choices = [[path.split(os.path.sep)[-2], path] for path in envs]
-        self.choices.append(["default", shutil.which(self.interpreter_versions[version])])
-        sublime.message_dialog("Select a python interpreter for the new project")
+        self.choices.append(
+            ["default", shutil.which(self.interpreter_versions[version])])
+        sublime.message_dialog(
+            "Select a python interpreter for the new project")
         self.window.show_quick_panel(self.choices, self.set_interpreter)
 
 
@@ -595,7 +622,8 @@ class DjangoNewAppCommand(DjangoSimpleCommand):
         subprocess.Popen(command.split(' '), env=os.environ.copy())
 
     def run(self):
-        self.window.show_input_panel("App name", '', self.create_app, None, None)
+        self.window.show_input_panel(
+            "App name", '', self.create_app, None, None)
 
 
 class DjangoOpenDocsCommand(DjangoCommand):
@@ -609,10 +637,12 @@ class DjangoOpenDocsCommand(DjangoCommand):
 class DjangoSearchDocsCommand(DjangoCommand):
 
     def on_done(self, text):
-        releases = {'1.3': 5, '1.4': 6, '1.5': 7, '1.6': 9, '1.7': 11, '1.8': 13, 'dev': 1}
+        releases = {'1.3': 5, '1.4': 6, '1.5': 7,
+                    '1.6': 9, '1.7': 11, '1.8': 13, 'dev': 1}
         release = releases[self.get_version()]
         params = {'q': text, 'release': release}
-        url = "https://docs.djangoproject.com/search/?{}".format(urlencode(params))
+        url = "https://docs.djangoproject.com/search/?{}".format(
+            urlencode(params))
         self.window.run_command('open_url', {'url': url})
 
     def run(self):
