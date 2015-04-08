@@ -18,11 +18,13 @@ Everything tested and running!
 * __Virtualenv support__
 * __Django boilerplate__
 * __Install your dependencies__
+* __Install new pip packages__
 * __Open and search in django documentation from the editor__
 * __Create new projects from ST__
 * __Start new apps__
 * __South support__
-
+* __PostgreSQL specific features snippets__
+* __And More!__
 
 ## Installation
 
@@ -72,6 +74,7 @@ Currently supports following commands:
  * `Django: Terminal Here`
  * `Django: Pip Freeze`
  * `Django: Pip Freeze To File`
+ * `Django: Pip Install Packages`
  * `Django: Pip Install Requirements`
 
 ### Settings
