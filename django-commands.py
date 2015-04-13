@@ -155,6 +155,7 @@ class DjangoSimpleCommand(DjangoCommand):
         return "{} {}".format(self.command, " ".join(self.extra_args))
 
     def run(self):
+        self.extra_args = []
         command = self.get_command()
         self.run_command(command)
 
