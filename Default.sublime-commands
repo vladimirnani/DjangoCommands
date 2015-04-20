@@ -12,6 +12,10 @@
         "command": "django_run"
     },
     {
+        "caption": "Django: Run Custom Server",
+        "command": "django_run_custom"
+    },
+    {
         "caption": "Django: Sync Database",
         "command": "django_syncdb"
     },

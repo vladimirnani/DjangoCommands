@@ -116,8 +116,9 @@ class DjangoCommand(sublime_plugin.WindowCommand):
 
 class CommandThread(threading.Thread):
 
-    def __init__(self, command):
+    def __init__(self, command, cwd='.'):
         self.command = command
+        self.cwd = cwd
         threading.Thread.__init__(self)
 
     def run(self):
@@ -144,7 +145,7 @@ class CommandThread(threading.Thread):
             ]
 
         log('Command is : {0}'.format(str(command)))
-        subprocess.Popen(command, env=env)
+        subprocess.Popen(command, env=env, cwd=self.cwd)
 
 
 class DjangoSimpleCommand(DjangoCommand):
@@ -231,6 +232,24 @@ class DjangoRunCommand(DjangoSimpleCommand):
         self.extra_args = [host, port]
         inComannd = "{} {}:{}".format(self.command, host, port)
         self.run_command(inComannd)
+
+
+class DjangoRunCustomCommand(DjangoSimpleCommand):
+
+    def get_script(self, executable, script_name):
+        return os.path.join(os.path.dirname(executable), script_name)
+
+    def run(self):
+        project = self.window.project_data()
+        p_settings = 'settings' in project.keys()
+        self.custom_command = project['settings'].get('server_custom_command') if p_settings else None
+        self.define_terminal()
+        executable = self.get_executable()
+        script = self.custom_command.get('command')
+        script = script if os.path.exists(script) else self.get_script(executable, script)
+        command = "{} {} {}".format(executable, script, " ".join(self.custom_command.get('args')))
+        thread = CommandThread(command, cwd=os.path.dirname(self.get_manage_py()))
+        thread.start()
 
 
 class DjangoSyncdbCommand(DjangoSimpleCommand):

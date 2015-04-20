@@ -14,7 +14,6 @@ Currently tested on Windows 7/8, Mac OS, Ubuntu.
 
 Everything tested and running!
 
-* __Django 1.7 support__
 * __Virtualenv support__
 * __Django boilerplate__
 * __Install your dependencies__
@@ -22,7 +21,7 @@ Everything tested and running!
 * __Open and search in django documentation from the editor__
 * __Create new projects from ST__
 * __Start new apps__
-* __South support__
+* __Run custom servers__
 * __PostgreSQL specific features snippets__
 * __And More!__
 
@@ -48,6 +47,7 @@ Currently supports following commands:
  * `Django: New Project`
  * `Django: New App`
  * `Django: Run Server`
+ * `Django: Run Custom Server`
  * `Django: Boilerplate`
  * `Django: Sync Database`
  * `Django: Test`
@@ -86,12 +86,14 @@ Currently supports following commands:
  * `server_port`: port for the server to listen
  * `linux_terminal`: Only Linux setting for command line emulator
  * `project_override`: (Boolean) Per project setting "python_interpreter" overrides "python_bin"
+ 
+ * `server_custom_command`: Per project setting to specify a custom server to run (ex: {"command": "gunicorn", "args":["--workers=3"]}) __use any script you want__
 
  __It's important to set your envs directories__
 
  __Check that your 'linux\_terminal' setting uses an underscore "\_"__
 
-#### Please report any issue, bug, enhacement or comment [here](https://github.com/vladimirnani/DjangoCommands/issues) 
-#### We'll be glad to read and work on all of them
+### Please report any issue, bug, enhacement or comment [here](https://github.com/vladimirnani/DjangoCommands/issues) 
+### We'll be glad to read and work on all of them
 
 
