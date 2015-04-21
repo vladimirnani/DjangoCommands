@@ -227,8 +227,8 @@ class DjangoRunCommand(DjangoSimpleCommand):
     command = 'runserver'
 
     def run(self):
-        port = self.settings.get('server_port')
-        host = self.settings.get('server_host')
+        port = self.settings.get('server_port', "127.0.0.1")
+        host = self.settings.get('server_host', "8000")
         self.extra_args = [host, port]
         inComannd = "{} {}:{}".format(self.command, host, port)
         self.run_command(inComannd)
@@ -247,8 +247,9 @@ class DjangoRunCustomCommand(DjangoSimpleCommand):
         executable = self.get_executable()
         script = self.custom_command.get('command')
         script = script if os.path.exists(script) else self.get_script(executable, script)
-        command = "{} {} {}".format(executable, script, " ".join(self.custom_command.get('args')))
-        thread = CommandThread(command, cwd=os.path.dirname(self.get_manage_py()))
+        commands = [executable, script, " ".join(self.custom_command.get('args'))] if self.custom_command.get(
+            'run_with_python', True) else ["", script, " ".join(self.custom_command.get('args'))]
+        thread = CommandThread("{} {} {}".format(*commands), cwd=os.path.dirname(self.get_manage_py()))
         thread.start()
 
 
