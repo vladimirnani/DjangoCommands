@@ -18,6 +18,48 @@
     // Linux only: terminal emulator, not everyone has gnome-terminal
     "linux_terminal": "gnome-terminal",
     // Per project setting "python_interpreter" overrides "python_bin"
-    "project_override": true
+    "project_override": true,
+    
 
+    // Example Settings THIS SETTINGS ARE PER PROJECT FILE inside the settings 
+        "server_custom_command": 
+        {
+         "command": "gunicorn",
+         "args":
+         [
+             "example.wsgi:application",
+             "--bind",
+             "0.0.0.0:8000",
+             "--workers=3",
+             "--log-file=-"
+         ]
+        },
+        //or
+        "server_custom_command":
+        {
+            "command": "uwsgi",
+            "args":
+            [
+                "--chdir=/path/to/your/project/",
+                "--module=example.wsgi:application",
+                "--env",
+                "DJANGO_SETTINGS_MODULE=example.settings",
+                "--socket=example.com:8000",
+                "--processes=5",
+                "--uid=1000",
+                "--gid=2000",
+                "--harakiri=20",
+                "--max-requests=5000",
+                "--vacuum"
+            ],
+            "run_with_python": false
+        },
+        //or
+        "server_custom_command":
+        {
+            "command": "your_script.sh",
+            "args":
+            [],
+            "run_with_python": false
+        }
 }
