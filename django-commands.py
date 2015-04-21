@@ -4,17 +4,17 @@ import threading
 import subprocess
 import os
 import glob
-import ntpath
-import platform
-import shutil
 import re
 
+from ntpath import basename as ntbasename, split as ntsplit
+from shutil import which
+from platform import system
 from functools import partial
 from collections import OrderedDict
 from urllib.parse import urlencode
 
 SETTINGS_FILE = 'DjangoCommands.sublime-settings'
-PLATFORM = platform.system()
+PLATFORM = system()
 LATEST_DJANGO_RELEASE = 1.8
 TERMINAL = ''
 
@@ -49,12 +49,12 @@ class DjangoCommand(sublime_plugin.WindowCommand):
                 return settings_interpreter
             else:
                 version = self.settings.get("python_version")
-                return shutil.which(self.interpreter_versions[version])
+                return which(self.interpreter_versions[version])
         elif settings_interpreter is not None:
             return settings_interpreter
         else:
             version = self.settings.get("python_version")
-            return shutil.which(self.interpreter_versions[version])
+            return which(self.interpreter_versions[version])
 
     def get_version(self):
         binary = self.get_executable()
@@ -312,8 +312,8 @@ class DjangoSqlMigrationCommand(DjangoAppCommand):
     command = 'sqlmigrate'
 
     def path_leaf(self, path):
-        head, tail = ntpath.split(path)
-        return os.path.splitext(tail)[0] or os.path.splitext(ntpath.basename(head))[0]
+        head, tail = ntsplit(path)
+        return os.path.splitext(tail)[0] or os.path.splitext(ntbasename(head))[0]
 
     def is_enabled(self):
         return float(self.get_version()) >= 1.7 or self.get_version() == 'dev'
@@ -627,7 +627,7 @@ class DjangoNewProjectCommand(SetVirtualEnvCommand):
         envs = self.find_virtualenvs(venv_paths)
         self.choices = [[path.split(os.path.sep)[-2], path] for path in envs]
         self.choices.append(
-            ["default", shutil.which(self.interpreter_versions[version])])
+            ["default", which(self.interpreter_versions[version])])
         sublime.message_dialog(
             "Select a python interpreter for the new project")
         self.window.show_quick_panel(self.choices, self.set_interpreter)
