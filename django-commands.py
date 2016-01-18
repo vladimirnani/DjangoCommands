@@ -15,7 +15,7 @@ from urllib.parse import urlencode
 
 SETTINGS_FILE = 'DjangoCommands.sublime-settings'
 PLATFORM = system()
-LATEST_DJANGO_RELEASE = 1.8
+LATEST_DJANGO_RELEASE = 1.9
 TERMINAL = ''
 
 
@@ -317,7 +317,7 @@ class DjangoSqlMigrationCommand(DjangoAppCommand):
         return os.path.splitext(tail)[0] or os.path.splitext(ntbasename(head))[0]
 
     def is_enabled(self):
-        return float(self.get_version()) >= 1.7 or self.get_version() == 'dev'
+        return bool(float(self.get_version()) >= 1.7) or bool(self.get_version() == 'dev')
 
     def on_choose_migration(self, apps, index):
         if index == -1:
@@ -659,7 +659,7 @@ class DjangoSearchDocsCommand(DjangoCommand):
 
     def on_done(self, text):
         releases = {'1.3': 5, '1.4': 6, '1.5': 7,
-                    '1.6': 9, '1.7': 11, '1.8': 13, 'dev': 1}
+                    '1.6': 9, '1.7': 11, '1.8': 13, '1.9': 14, 'dev': 1}
         release = releases[self.get_version()]
         params = {'q': text, 'release': release}
         url = "https://docs.djangoproject.com/search/?{}".format(
