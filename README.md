@@ -76,22 +76,27 @@ Currently supports following commands:
  * `Django: Pip Freeze To File`
  * `Django: Pip Install Packages`
  * `Django: Pip Install Requirements`
+ * `Django: Set Project Interpreter`
 
 ### Settings
 
  * `python_bin`: path to python interpreter
  * `python_version` : default python interpreter version
- * `python_virtualenv_paths`: list of paths where virtualenvs are located (ex:`~/.virtualenvs/`)*
+ * `python_virtualenv_paths`: list of paths where virtualenvs are located (ex:`~/.virtualenvs/`)*\*
  * `server_host`: host for the runserver command
  * `server_port`: port for the server to listen
- * `linux_terminal`: Only Linux setting for command line emulator
+ * `linux_terminal`: Only Linux setting for command line emulator\*\*
  * `project_override`: (Boolean) Per project setting "python_interpreter" overrides "python_bin"
  
- * `server_custom_command`: Per project setting to specify a custom server to run (ex: {"command": "gunicorn", "args":["--workers=3"]}) __use any script you want__
+ * `server_custom_command`: Per project setting to specify a custom server to run (ex: {"command": "gunicorn", "args":["--workers=3"]})\*\*\* 
+ 
+\*It's important to set your envs directories
 
- __It's important to set your envs directories__
+\*The folders in this list should be the parent folder of the virtualenv folder, not the virtualenv folder itself
 
- __Check that your 'linux\_terminal' setting uses an underscore "\_"__
+\*\*Check that your 'linux\_terminal' setting uses an underscore "\_"
+
+\*\*\*use any script you want
 
 ### Please report any issue, bug, enhacement or comment [here](https://github.com/vladimirnani/DjangoCommands/issues) 
 ### We'll be glad to read and work on all of them

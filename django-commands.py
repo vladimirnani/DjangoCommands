@@ -486,6 +486,10 @@ class SetProjectInterpreterCommand(VirtualEnvCommand):
         if index == -1:
             return
         project = self.window.project_data()
+        if "settings" in project.keys():
+            pass
+        else:
+            project["settings"] = {}
         project["settings"]["python_interpreter"] = os.path.join(venvs[index][1], 'python')
         self.window.set_project_data(project)
 

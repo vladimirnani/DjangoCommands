@@ -80,6 +80,10 @@
         "command": "django_search_docs"
     },
     {
+        "caption": "Django: Set Project Interpreter",
+        "command": "set_project_interpreter"
+    },
+    {
         "caption": "Django: Shell",
         "command": "django_shell"
     },
