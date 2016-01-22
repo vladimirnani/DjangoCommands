@@ -366,6 +366,15 @@ class VirtualEnvCommand(DjangoCommand):
     def is_enabled(self):
         return self.settings.get('python_bin') is not None
 
+    def find_virtualenvs(self, venv_paths):
+        binary = "Scripts" if PLATFORM == 'Windows' else "bin"
+        venvs = set()
+        for path in venv_paths:
+            path = os.path.expanduser(path)
+            pattern = os.path.join(path, "*", binary, "activate_this.py")
+            venvs.update(list(map(os.path.dirname, glob.glob(pattern))))
+        return sorted(venvs)
+
     def run(self):
         self.define_terminal()
         self.manage_py = self.get_manage_py()
@@ -452,15 +461,6 @@ class SetVirtualEnvCommand(VirtualEnvCommand):
     def is_enabled(self):
         return True
 
-    def find_virtualenvs(self, venv_paths):
-        binary = "Scripts" if PLATFORM == 'Windows' else "bin"
-        venvs = set()
-        for path in venv_paths:
-            path = os.path.expanduser(path)
-            pattern = os.path.join(path, "*", binary, "activate_this.py")
-            venvs.update(list(map(os.path.dirname, glob.glob(pattern))))
-        return sorted(venvs)
-
     def set_virtualenv(self, venvs, index):
         if index == -1:
             return
@@ -475,6 +475,25 @@ class SetVirtualEnvCommand(VirtualEnvCommand):
         choices = self.find_virtualenvs(venv_paths)
         choices = [[path.split(os.path.sep)[-2], path] for path in choices]
         self.choose(choices, self.set_virtualenv)
+
+
+class SetProjectInterpreterCommand(VirtualEnvCommand):
+
+    def is_enabled(self):
+        return True
+
+    def set_project_interpreter(self, venvs, index):
+        if index == -1:
+            return
+        project = self.window.project_data()
+        project["settings"]["python_interpreter"] = os.path.join(venvs[index][1], 'python')
+        self.window.set_project_data(project)
+
+    def run(self):
+        venv_paths = self.settings.get("python_virtualenv_paths", [])
+        choices = self.find_virtualenvs(venv_paths)
+        choices = [[path.split(os.path.sep)[-2], path] for path in choices]
+        self.choose(choices, self.set_project_interpreter)
 
 
 class ChangeDefaultCommand(VirtualEnvCommand):
