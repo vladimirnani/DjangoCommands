@@ -9,7 +9,7 @@
     , "command": "django_run"
     , "context": [{ "key": "selector", "operator": "equal", "operand": "text.html.django" }]
   },
-  { "keys": ["ctrl+d", "ctrl+a"]
+  { "keys": ["ctrl+shift+a"]
   , "command": "show_overlay"
   , "args": {"overlay": "command_palette", "text": "Django:"} },
 ]
