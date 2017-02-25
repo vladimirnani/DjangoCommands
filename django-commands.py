@@ -15,7 +15,6 @@ from urllib.parse import urlencode
 
 SETTINGS_FILE = 'DjangoCommands.sublime-settings'
 PLATFORM = system()
-LATEST_DJANGO_RELEASE = 1.9
 TERMINAL = ''
 
 
@@ -65,12 +64,14 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         if PLATFORM == 'Windows':
             startupinfo = subprocess.STARTUPINFO()
             startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-
-        output = subprocess.check_output(command, startupinfo=startupinfo)
-        version = re.match(r'(\d\.\d)', output.decode('utf-8')).group(0)
-        if float(version) > LATEST_DJANGO_RELEASE:
-            version = 'dev'
-        return version
+        try:
+            output = subprocess.check_output(command, startupinfo=startupinfo)
+        except subprocess.CalledProcessError:
+            log("No Django installed in current environment")
+            return 0
+        else:
+            version = re.match(r'(\d\.\d+)', output.decode('utf-8')).group(0)
+            return version
 
     def find_manage_py(self):
         for path in sublime.active_window().folders():
@@ -682,11 +683,12 @@ class DjangoOpenDocsCommand(DjangoCommand):
 class DjangoSearchDocsCommand(DjangoCommand):
 
     def on_done(self, text):
-        releases = {'1.3': 5, '1.4': 6, '1.5': 7,
-                    '1.6': 9, '1.7': 11, '1.8': 13, '1.9': 14, 'dev': 1}
-        release = releases[self.get_version()]
-        params = {'q': text, 'release': release}
-        url = "https://docs.djangoproject.com/search/?{}".format(
+        release = self.get_version()
+        if release == 0:
+            return
+        params = {'q': text}
+        url = "https://docs.djangoproject.com/en/{}/search/?{}".format(
+            release,
             urlencode(params))
         self.window.run_command('open_url', {'url': url})
 
