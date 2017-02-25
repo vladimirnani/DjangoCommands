@@ -96,7 +96,7 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         self.manage_py = self.get_manage_py()
         self.go_to_project_home()
 
-        command = "{} {} {}".format(binary, self.manage_py, command)
+        command = [binary, self.manage_py] + command.split(' ')
         return command
 
     def define_terminal(self):
@@ -116,13 +116,17 @@ class DjangoCommand(sublime_plugin.WindowCommand):
 
 class CommandThread(threading.Thread):
 
-    def __init__(self, command, cwd='.'):
+    def __init__(self, command, cwd='.', notsplit=False):
         self.command = command
+        self.notsplit = notsplit
         self.cwd = cwd
         threading.Thread.__init__(self)
 
     def run(self):
-        command = "{}".format(self.command)
+        if(self.notsplit):
+            command = "{}".format(' '.join(self.command))
+        else:
+            command = "{}".format(' '.join([cmd.replace(' ', "\ ") for cmd in self.command]))
         env = os.environ.copy()
         if PLATFORM == 'Windows':
             command = [
@@ -204,8 +208,7 @@ class DjangoAppCommand(DjangoCommand):
 class DjangoOtherCommand(DjangoSimpleCommand):
 
     def get_commands(self):
-        forSplit = self.format_command('help --commands')
-        command = forSplit.split(' ')
+        command = self.format_command('help --commands')
         out = str(subprocess.check_output(command))
         out = re.search('b\'(.*)\'', out).group(1)
         commands = out.split(
@@ -380,8 +383,7 @@ class VirtualEnvCommand(DjangoCommand):
         self.manage_py = self.get_manage_py()
         self.go_to_project_home()
         bin_dir = os.path.dirname(self.settings.get('python_bin'))
-        command = "{} {}".format(
-            os.path.join(bin_dir, self.command), " ".join(self.extra_args))
+        command = [os.path.join(bin_dir, self.command)] + self.extra_args
         thread = CommandThread(command)
         thread.start()
 
@@ -395,12 +397,10 @@ class TerminalHereCommand(VirtualEnvCommand):
         self.go_to_project_home()
         bin_dir = os.path.dirname(self.settings.get('python_bin'))
         if PLATFORM == 'Windows':
-            command = 'cmd /k {}'.format(
-                os.path.join(bin_dir, self.command))
+            command = ['cmd', '/k', '{}'.format(os.path.join(bin_dir, self.command))]
         if PLATFORM == 'Linux' or PLATFORM == 'Darwin':
-            command = "bash --rcfile <(echo '. ~/.bashrc && . {}')".format(
-                os.path.join(bin_dir, self.command))
-        thread = CommandThread(command)
+            command = ["bash", "--rcfile", "<(echo '. ~/.bashrc && . {}')".format(os.path.join(bin_dir, self.command))]
+        thread = CommandThread(command, notsplit=True)
         thread.start()
 
 
@@ -663,7 +663,8 @@ class DjangoNewAppCommand(DjangoSimpleCommand):
     def create_app(self, text):
         self.extra_args.append(text)
         command = self.format_command(self.get_command())
-        subprocess.Popen(command.split(' '), env=os.environ.copy())
+        log(command)
+        subprocess.Popen(command, env=os.environ.copy())
 
     def run(self):
         self.window.show_input_panel(
