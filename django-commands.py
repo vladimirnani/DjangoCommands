@@ -29,7 +29,6 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         self.settings = sublime.load_settings(SETTINGS_FILE)
         self.interpreter_versions = {2: "python2",
                                      3: "python3"} if PLATFORM is not "Windows" else {2: "python", 3: "python"}
-        log("{} ready".format(self.__class__.__name__))
         sublime_plugin.WindowCommand.__init__(self, *args, **kwargs)
 
     def get_manage_py(self):
@@ -59,7 +58,6 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         binary = self.get_executable()
         command = [binary, '-c', 'import django;print(django.get_version())']
 
-        # Hide the console window on Windows
         startupinfo = None
         if PLATFORM == 'Windows':
             startupinfo = subprocess.STARTUPINFO()
@@ -67,7 +65,8 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         try:
             output = subprocess.check_output(command, startupinfo=startupinfo)
         except subprocess.CalledProcessError:
-            log("No Django installed in current environment")
+            log("Django is not installed in current environment")
+            sublime.message_dialog("No django module was found on the current environment")
             return 0
         else:
             version = re.match(r'(\d\.\d+)', output.decode('utf-8')).group(0)
@@ -321,7 +320,7 @@ class DjangoSqlMigrationCommand(DjangoAppCommand):
         return os.path.splitext(tail)[0] or os.path.splitext(ntbasename(head))[0]
 
     def is_enabled(self):
-        return bool(float(self.get_version()) >= 1.7) or bool(self.get_version() == 'dev')
+        return True
 
     def on_choose_migration(self, apps, index):
         if index == -1:
@@ -334,8 +333,7 @@ class DjangoSqlMigrationCommand(DjangoAppCommand):
         self.name = apps[index]
         path = os.path.join(
             os.path.dirname(self.find_apps()[index]), 'migrations')
-        migrations = [
-            path for path in map(self.path_leaf, glob.iglob(os.path.join(path, r'*.py')))]
+        migrations = [_path for _path in map(self.path_leaf, glob.iglob(os.path.join(path, r'*.py')))]
         migrations.remove('__init__')
         sublime.set_timeout(
             lambda: self.choose(migrations, self.on_choose_migration), 20)
@@ -676,6 +674,8 @@ class DjangoOpenDocsCommand(DjangoCommand):
 
     def run(self):
         version = self.get_version()
+        if version == 0:
+            return
         url = "https://docs.djangoproject.com/en/{}/".format(version)
         self.window.run_command('open_url', {'url': url})
 
