@@ -1,5 +1,7 @@
 # DjangoCommands for ST2
 
+# DjangoCommands is no longer under active development and it is only been kept for those who still use ST2, I really encourage the migration to ST3 where you will be able to enjoy a lot of new features not just in this package but in many packages and the editor itself
+
 ###The best tool for your django development.
 
 This tool is a Sublime Text wrapper around django `manage.py` commands.
