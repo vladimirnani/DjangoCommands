@@ -666,6 +666,7 @@ class DjangoNewAppCommand(DjangoSimpleCommand):
         subprocess.Popen(command, env=os.environ.copy())
 
     def run(self):
+        self.extra_args = list()
         self.window.show_input_panel(
             "App name", '', self.create_app, None, None)
 
