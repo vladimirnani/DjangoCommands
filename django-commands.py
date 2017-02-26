@@ -230,8 +230,8 @@ class DjangoRunCommand(DjangoSimpleCommand):
     command = 'runserver'
 
     def run(self):
-        port = self.settings.get('server_port', "127.0.0.1")
-        host = self.settings.get('server_host', "8000")
+        port = self.settings.get('server_port', "8000")
+        host = self.settings.get('server_host', "127.0.0.1")
         self.extra_args = [host, port]
         inComannd = "{} {}:{}".format(self.command, host, port)
         self.run_command(inComannd)
@@ -367,6 +367,13 @@ class VirtualEnvCommand(DjangoCommand):
 
     def is_enabled(self):
         return self.settings.get('python_bin') is not None
+
+    def display_error_message(process)
+        outs, err = process.communicate()
+        if err.decode():
+            sublime.message_dialog(err.decode())
+        else:
+            return
 
     def find_virtualenvs(self, venv_paths):
         binary = "Scripts" if PLATFORM == 'Windows' else "bin"
@@ -633,7 +640,8 @@ class DjangoNewProjectCommand(SetVirtualEnvCommand):
             os.path.abspath(os.path.dirname(self.interpreter)), "django-admin.py")
         command = [self.interpreter, order, "startproject", name, directory]
         log(command)
-        subprocess.Popen(command)
+        process = subprocess.Popen(command)
+        self.display_error_message(process)
 
     def set_interpreter(self, index):
         if index == -1:
@@ -663,7 +671,8 @@ class DjangoNewAppCommand(DjangoSimpleCommand):
         self.extra_args.append(text)
         command = self.format_command(self.get_command())
         log(command)
-        subprocess.Popen(command, env=os.environ.copy())
+        process = subprocess.Popen(command, env=os.environ.copy(), stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+        self.display_error_message(process)
 
     def run(self):
         self.extra_args = list()
