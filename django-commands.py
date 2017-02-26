@@ -24,6 +24,8 @@ def log(message):
 
 class DjangoCommand(sublime_plugin.WindowCommand):
     project_true = True
+    error = False
+    error_msg = None
 
     def __init__(self, *args, **kwargs):
         self.settings = sublime.load_settings(SETTINGS_FILE)
@@ -32,7 +34,7 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         sublime_plugin.WindowCommand.__init__(self, *args, **kwargs)
 
     def get_manage_py(self):
-        return self.settings.get('django_project_root')or self.find_manage_py()
+        return self.settings.get('django_project_root') or self.find_manage_py()
 
     def get_executable(self):
         self.project_true = self.settings.get('project_override')
@@ -65,8 +67,8 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         try:
             output = subprocess.check_output(command, startupinfo=startupinfo)
         except subprocess.CalledProcessError:
-            log("Django is not installed in current environment")
-            sublime.message_dialog("No django module was found on the current environment")
+            self.error = True
+            self.error_msg = "No django module was found, check if Django is installed in the current environment"
             return 0
         else:
             version = re.match(r'(\d\.\d+)', output.decode('utf-8')).group(0)
@@ -77,6 +79,10 @@ class DjangoCommand(sublime_plugin.WindowCommand):
             for root, dirs, files in os.walk(path):
                 if 'manage.py' in files:
                     return os.path.join(root, 'manage.py')
+                else:
+                    self.error = True
+                    self.error_msg = "Manage.py not found"
+                    return str(None)
 
     def choose(self, choices, action):
         on_input = partial(action, choices)
@@ -107,9 +113,22 @@ class DjangoCommand(sublime_plugin.WindowCommand):
                 TERMINAL = self.settings.get(
                     'linux-terminal', 'gnome-terminal')
 
+    def display_error_message(self):
+        sublime.message_dialog(self.error_msg)
+        self.error = False
+
+    def display_process_error_message(self, process):
+        outs, err = process.communicate()
+        if err and err.decode():
+            sublime.message_dialog(err.decode())
+        else:
+            return
+
     def run_command(self, command):
         self.define_terminal()
         command = self.format_command(command)
+        if self.error:
+            self.display_error_message()
         thread = CommandThread(command)
         thread.start()
 
@@ -149,7 +168,10 @@ class CommandThread(threading.Thread):
             ]
 
         log('Command is : {0}'.format(str(command)))
-        subprocess.Popen(command, env=env, cwd=self.cwd)
+        try:
+            subprocess.Popen(command, env=env, cwd=self.cwd)
+        except (subprocess.CalledProcessError, ValueError, OSError) as e:
+            sublime.message_dialog("{}".format(e))
 
 
 class DjangoSimpleCommand(DjangoCommand):
@@ -253,7 +275,11 @@ class DjangoRunCustomCommand(DjangoSimpleCommand):
         commands = [executable, script, " ".join(self.custom_command.get('args'))] if self.custom_command.get(
             'run_with_python', True) else ["", script, " ".join(self.custom_command.get('args'))]
         thread = CommandThread("{} {} {}".format(*commands), cwd=os.path.dirname(self.get_manage_py()))
-        thread.start()
+        if self.error:
+            self.display_error_message()
+            return
+        else:
+            thread.start()
 
 
 class DjangoSyncdbCommand(DjangoSimpleCommand):
@@ -367,13 +393,6 @@ class VirtualEnvCommand(DjangoCommand):
 
     def is_enabled(self):
         return self.settings.get('python_bin') is not None
-
-    def display_error_message(process)
-        outs, err = process.communicate()
-        if err.decode():
-            sublime.message_dialog(err.decode())
-        else:
-            return
 
     def find_virtualenvs(self, venv_paths):
         binary = "Scripts" if PLATFORM == 'Windows' else "bin"
@@ -641,7 +660,7 @@ class DjangoNewProjectCommand(SetVirtualEnvCommand):
         command = [self.interpreter, order, "startproject", name, directory]
         log(command)
         process = subprocess.Popen(command)
-        self.display_error_message(process)
+        self.display_process_error_message(process)
 
     def set_interpreter(self, index):
         if index == -1:
@@ -653,6 +672,8 @@ class DjangoNewProjectCommand(SetVirtualEnvCommand):
             "Project name", "", self.check_folders, None, None)
 
     def run(self):
+        if self.get_version() == 0:
+            return
         venv_paths = self.settings.get("python_virtualenv_paths", [])
         version = self.settings.get("python_version")
         envs = self.find_virtualenvs(venv_paths)
@@ -671,10 +692,15 @@ class DjangoNewAppCommand(DjangoSimpleCommand):
         self.extra_args.append(text)
         command = self.format_command(self.get_command())
         log(command)
-        process = subprocess.Popen(command, env=os.environ.copy(), stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-        self.display_error_message(process)
+        if self.error:
+            self.display_error_message()
+        else:
+            process = subprocess.Popen(command, env=os.environ.copy(), stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+            self.display_process_error_message(process)
 
     def run(self):
+        if self.get_version() == 0:
+            return
         self.extra_args = list()
         self.window.show_input_panel(
             "App name", '', self.create_app, None, None)
@@ -685,6 +711,7 @@ class DjangoOpenDocsCommand(DjangoCommand):
     def run(self):
         version = self.get_version()
         if version == 0:
+            self.display_error_message()
             return
         url = "https://docs.djangoproject.com/en/{}/".format(version)
         self.window.run_command('open_url', {'url': url})
@@ -695,6 +722,7 @@ class DjangoSearchDocsCommand(DjangoCommand):
     def on_done(self, text):
         release = self.get_version()
         if release == 0:
+            self.display_error_message()
             return
         params = {'q': text}
         url = "https://docs.djangoproject.com/en/{}/search/?{}".format(

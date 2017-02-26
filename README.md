@@ -1,6 +1,6 @@
 # DjangoCommands for ST3
 
-###The best tool for your django development.
+### The best tool for your django development.
 
 This tool is a Sublime Text wrapper around django `manage.py` commands.
 
@@ -10,7 +10,7 @@ You can also run `Django: Custom Command` to access other manage.py commands. Tr
 
 Or you can choose to use `Django: Other Command` to list and run all commands available to `manage.py`
 
-Currently tested on Windows 7/8, Mac OS, Ubuntu.
+Currently tested on Windows 7/8/10, Mac OS, Ubuntu and many other linux distros.
 
 Everything tested and running!
 
