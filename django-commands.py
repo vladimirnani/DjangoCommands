@@ -81,7 +81,7 @@ class DjangoCommand(sublime_plugin.WindowCommand):
                     return os.path.join(root, 'manage.py')
                 else:
                     self.error = True
-                    self.error_msg = "Manage.py not found"
+                    self.error_msg = "manage.py not found, unable to proceed"
                     return str(None)
 
     def choose(self, choices, action):
@@ -114,13 +114,13 @@ class DjangoCommand(sublime_plugin.WindowCommand):
                     'linux-terminal', 'gnome-terminal')
 
     def display_error_message(self):
-        sublime.message_dialog(self.error_msg)
+        sublime.error_message(self.error_msg)
         self.error = False
 
     def display_process_error_message(self, process):
         outs, err = process.communicate()
         if err and err.decode():
-            sublime.message_dialog(err.decode())
+            sublime.error_message(err.decode())
         else:
             return
 
@@ -129,6 +129,7 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         command = self.format_command(command)
         if self.error:
             self.display_error_message()
+            return
         thread = CommandThread(command)
         thread.start()
 
@@ -457,6 +458,7 @@ class PipInstallPackagesCommand(VirtualEnvCommand):
         super(PipInstallPackagesCommand, self).run()
 
     def run(self):
+        self.extra_args = ['install']
         self.window.show_input_panel(
             'Packages', '', self.appendPackages, None, None)
 
@@ -566,7 +568,6 @@ class DjangoClickCommand(sublime_plugin.TextCommand):
         tag, targets = self.parse_tag(line_contents)
 
         if tag:
-            # get the base-path of current file
             base, current_file = self.view.file_name().split(
                 '%(separator)stemplates%(separator)s' % dict(
                     separator=os.path.sep), 1)
@@ -623,7 +624,7 @@ urlpatterns = [
             actions[option] = eval(option)
         text = actions[self.options[index]]
         self.view = self.window.active_view()
-        self.view.run_command('write_helper', {"text": text})
+        self.view.run_command('write_helper', {"text": text, "point": 0})
 
     def run(self):
         self.window.show_quick_panel(self.options, self.on_done)
@@ -631,8 +632,8 @@ urlpatterns = [
 
 class WriteHelperCommand(sublime_plugin.TextCommand):
 
-    def run(self, edit, text):
-        self.view.insert(edit, 0, text)
+    def run(self, edit, point, text):
+        self.view.insert(edit, point, text)
 
 
 class DjangoNewProjectCommand(SetVirtualEnvCommand):
@@ -731,4 +732,9 @@ class DjangoSearchDocsCommand(DjangoCommand):
         self.window.run_command('open_url', {'url': url})
 
     def run(self):
-        self.window.show_input_panel('Search:', '', self.on_done, None, None)
+        sel = self.window.active_view().substr(self.window.active_view().sel()[0])
+        if(sel is not None):
+            selection = sel
+        else:
+            selection = ''
+        self.window.show_input_panel('Search:', selection, self.on_done, None, None)
