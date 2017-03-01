@@ -1,3 +1,4 @@
+<a href="https://packagecontrol.io/packages/Django%20Manage%20Commands"><img src="https://packagecontrol.herokuapp.com/downloads/Django%20Manage%20Commands.svg?color=42A672"></a>
 # DjangoCommands for ST3
 
 ### The best tool for your django development.
