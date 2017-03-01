@@ -82,7 +82,7 @@ class DjangoCommand(sublime_plugin.WindowCommand):
                 else:
                     self.error = True
                     self.error_msg = "manage.py not found, unable to proceed"
-                    return str(None)
+                    return None
 
     def choose(self, choices, action):
         on_input = partial(action, choices)
@@ -95,7 +95,12 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         except:
             return
         base_dir = os.path.abspath(os.path.join(self.manage_py, os.pardir))
-        os.chdir(base_dir)
+        if(os.path.exists(base_dir)):
+            os.chdir(base_dir)
+        else:
+            self.error = True
+            self.error_msg = "Project root not found"
+            return
 
     def format_command(self, command):
         binary = self.get_executable()
@@ -126,11 +131,11 @@ class DjangoCommand(sublime_plugin.WindowCommand):
 
     def run_command(self, command):
         self.define_terminal()
-        command = self.format_command(command)
+        commands = self.format_command(command)
         if self.error:
             self.display_error_message()
             return
-        thread = CommandThread(command)
+        thread = CommandThread(commands)
         thread.start()
 
 
@@ -143,16 +148,26 @@ class CommandThread(threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
-        if(self.notsplit):
+        env = os.environ.copy()
+
+        if PLATFORM == 'Windows':
+            print(self.command)
+            command = ['cmd.exe', '/k', self.command[0], '{}'.format(self.command[1])]
+            for index, param in enumerate(self.command):
+                if(index < 2):
+                    continue
+                else:
+                    if param:
+                        print(param)
+                        command.append(param)
+            command.extend(['&&', 'timeout', '/T', '10', '&&', 'exit'])
+
+        elif(self.notsplit):
             command = "{}".format(' '.join(self.command))
+
         else:
             command = "{}".format(' '.join([cmd.replace(' ', "\ ") for cmd in self.command]))
-        env = os.environ.copy()
-        if PLATFORM == 'Windows':
-            command = [
-                'cmd.exe',
-                '/k', "{} && timeout /T 10 && exit".format(command)
-            ]
+
         if PLATFORM == 'Linux':
             command = [
                 TERMINAL,
