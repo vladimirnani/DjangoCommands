@@ -34,7 +34,7 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         sublime_plugin.WindowCommand.__init__(self, *args, **kwargs)
 
     def get_manage_py(self):
-        return self.settings.get('django_project_root') or self.find_manage_py()
+        return self.find_manage_py()
 
     def get_executable(self):
         self.project_true = self.settings.get('project_override')
@@ -75,7 +75,9 @@ class DjangoCommand(sublime_plugin.WindowCommand):
             return version
 
     def find_manage_py(self):
-        django_project_root = sublime.active_window().active_view().settings().get('django_project_root')
+        django_project_root = \
+            sublime.active_window().active_view().settings().get('django_project_root') \
+            or self.settings.get('django_project_root')
         for path in [django_project_root] if django_project_root else sublime.active_window().folders():
             for root, dirs, files in os.walk(path):
                 if 'manage.py' in files:
