@@ -33,8 +33,14 @@ class DjangoCommand(sublime_plugin.WindowCommand):
                                      3: "python3"} if PLATFORM is not "Windows" else {2: "python", 3: "python"}
         sublime_plugin.WindowCommand.__init__(self, *args, **kwargs)
 
-    def get_manage_py(self):
-        return self.find_manage_py()
+    @property
+    def startupinfo(self):
+        if PLATFORM == 'Windows':
+            startupinfo = subprocess.STARTUPINFO()
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            return startupinfo
+        else:
+            return None
 
     def get_executable(self):
         self.project_true = self.settings.get('project_override')
@@ -60,12 +66,8 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         binary = self.get_executable()
         command = [binary, '-c', 'import django;print(django.get_version())']
 
-        startupinfo = None
-        if PLATFORM == 'Windows':
-            startupinfo = subprocess.STARTUPINFO()
-            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
         try:
-            output = subprocess.check_output(command, startupinfo=startupinfo)
+            output = subprocess.check_output(command, startupinfo=self.startupinfo)
         except subprocess.CalledProcessError:
             self.error = True
             self.error_msg = "No django module was found, check if Django is installed in the current environment"
@@ -107,7 +109,7 @@ class DjangoCommand(sublime_plugin.WindowCommand):
 
     def format_command(self, command):
         binary = self.get_executable()
-        self.manage_py = self.get_manage_py()
+        self.manage_py = self.find_manage_py()
         self.go_to_project_home()
 
         command = [binary, self.manage_py] + command.split(' ')
@@ -238,7 +240,7 @@ class DjangoAppCommand(DjangoCommand):
     def run(self):
         self.go_to_project_home()
         choices = self.find_apps()
-        self.manage_py = self.get_manage_py()
+        self.manage_py = self.find_manage_py()
         base_dir = os.path.dirname(self.manage_py)
         choices = [self.prettify(path, base_dir) for path in choices]
         self.choose(choices, self.on_choose_app)
@@ -248,7 +250,7 @@ class DjangoOtherCommand(DjangoSimpleCommand):
 
     def get_commands(self):
         command = self.format_command('help --commands')
-        out = str(subprocess.check_output(command))
+        out = str(subprocess.check_output(command, startupinfo=self.startupinfo))
         out = re.search('b\'(.*)\'', out).group(1)
         commands = out.split(
             '\\n')[:-1] if PLATFORM is not "Windows" else out.split('\\r\\n')[:-1]
@@ -291,7 +293,7 @@ class DjangoRunCustomCommand(DjangoSimpleCommand):
         script = script if os.path.exists(script) else self.get_script(executable, script)
         commands = [executable, script, " ".join(self.custom_command.get('args'))] if self.custom_command.get(
             'run_with_python', True) else ["", script, " ".join(self.custom_command.get('args'))]
-        thread = CommandThread("{} {} {}".format(*commands), cwd=os.path.dirname(self.get_manage_py()))
+        thread = CommandThread("{} {} {}".format(*commands), cwd=os.path.dirname(self.find_manage_py()))
         if self.error:
             self.display_error_message()
             return
@@ -385,7 +387,7 @@ class DjangoSqlMigrationCommand(DjangoAppCommand):
         self.extra_args = []
         self.go_to_project_home()
         choices = self.find_apps()
-        self.manage_py = self.get_manage_py()
+        self.manage_py = self.find_manage_py()
         base_dir = os.path.dirname(self.manage_py)
         choices = [self.prettify(path, base_dir) for path in choices]
         self.choose(choices, self.on_app_selected)
@@ -422,7 +424,7 @@ class VirtualEnvCommand(DjangoCommand):
 
     def run(self):
         self.define_terminal()
-        self.manage_py = self.get_manage_py()
+        self.manage_py = self.find_manage_py()
         self.go_to_project_home()
         bin_dir = os.path.dirname(self.settings.get('python_bin'))
         command = [os.path.join(bin_dir, self.command)] + self.extra_args
@@ -435,7 +437,7 @@ class TerminalHereCommand(VirtualEnvCommand):
 
     def run(self):
         self.define_terminal()
-        self.manage_py = self.get_manage_py()
+        self.manage_py = self.find_manage_py()
         self.go_to_project_home()
         bin_dir = os.path.dirname(self.settings.get('python_bin'))
         if PLATFORM == 'Windows':
@@ -676,7 +678,7 @@ class DjangoNewProjectCommand(SetVirtualEnvCommand):
             os.path.abspath(os.path.dirname(self.interpreter)), "django-admin.py")
         command = [self.interpreter, order, "startproject", name, directory]
         log(command)
-        process = subprocess.Popen(command)
+        process = subprocess.Popen(command, startupinfo=self.startupinfo)
         self.display_process_error_message(process)
 
     def set_interpreter(self, index):
@@ -712,7 +714,8 @@ class DjangoNewAppCommand(DjangoSimpleCommand):
         if self.error:
             self.display_error_message()
         else:
-            process = subprocess.Popen(command, env=os.environ.copy(), stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+            process = subprocess.Popen(command, env=os.environ.copy(), stderr=subprocess.PIPE,
+                                       stdout=subprocess.PIPE, startupinfo=self.startupinfo)
             self.display_process_error_message(process)
 
     def run(self):
