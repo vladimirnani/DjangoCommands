@@ -1,15 +1,48 @@
 <a href="https://packagecontrol.io/packages/Django%20Manage%20Commands"><img src="https://packagecontrol.herokuapp.com/downloads/Django%20Manage%20Commands.svg?color=42A672"></a>
-# DjangoCommands for ST3
+
+     ____  _                           __  __                                           
+    |  _ \(_) __ _ _ __   __ _  ___   |  \/  | __ _ _ __   __ _  __ _  ___              
+    | | | | |/ _` | '_ \ / _` |/ _ \  | |\/| |/ _` | '_ \ / _` |/ _` |/ _ \             
+    | |_| | | (_| | | | | (_| | (_) | | |  | | (_| | | | | (_| | (_| |  __/             
+    |____// |\__,_|_| |_|\__, |\___/  |_|  |_|\__,_|_| |_|\__,_|\__, |\___|             
+        |__/             |___/                                  |___/                   
+      ____                                          _                                   
+     / ___|___  _ __ ___  _ __ ___   __ _ _ __   __| |___                               
+    | |   / _ \| '_ ` _ \| '_ ` _ \ / _` | '_ \ / _` / __|                              
+    | |__| (_) | | | | | | | | | | | (_| | | | | (_| \__ \                              
+     \____\___/|_| |_| |_|_| |_| |_|\__,_|_| |_|\__,_|___/                              
+                                                                                        
+#########################################################################################
+
+## Django manage commands
 
 ### The best tool for your django development.
 
+## Overview
+
 This tool is a Sublime Text wrapper around django `manage.py` commands.
 
-With it you can run django commands like `Django: Run Server`, `Django: Sync Database`, `Django: Migrate` from Command Palette.
+### So you can create new `Django` projects and apps directly from Sublime text like this
+
+![new project](http://i.giphy.com/3oKIPjMXcl4xWh4Y8M.gif "New project screen")
+
+### Make migrations, migrate the database  or run tests
+
+![migrations](http://i.giphy.com/3oKIPnnN6HjE0ofhde.gif "make migrations")
+
+### And run the test server
+![runserver](http://i.giphy.com/3oKIPdSCp3XDX7Eqze.gif "run server")  
+
+### Even run tests
+
+![Tests](http://i.giphy.com/3oKIPfFrzQvmUj50Ji.gif "tests")  
+
 
 You can also run `Django: Custom Command` to access other manage.py commands. Try `Django: Help` and you will get full list of commands provided by each application.
 
 Or you can choose to use `Django: Other Command` to list and run all commands available to `manage.py`
+
+![other](http://i.giphy.com/3oKIPAwltfeuKESVTW.gif "other commands")  
 
 Currently tested on Windows 7/8/10, Mac OS, Ubuntu and many other linux distros.
 
@@ -83,7 +116,7 @@ Currently supports following commands:
 
  * `python_bin`: path to python interpreter
  * `python_version` : default python interpreter version
- * `python_virtualenv_paths`: list of paths where virtualenvs are located (ex:`~/.virtualenvs/`)*\*
+ * `python_virtualenv_paths`: list of paths where virtualenvs are located (ex:`~/.virtualenvs/`)\* 
  * `server_host`: host for the runserver command
  * `server_port`: port for the server to listen
  * `linux_terminal`: Only Linux setting for command line emulator\*\*
