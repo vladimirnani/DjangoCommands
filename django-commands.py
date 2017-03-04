@@ -280,6 +280,9 @@ class DjangoRunCommand(DjangoSimpleCommand):
         self.extra_args = [host, port]
         inComannd = "{} {}:{}".format(self.command, host, port)
         self.run_command(inComannd)
+        if(self.settings.get('browser_after_runserver', False)):
+            sublime.set_timeout(
+                lambda: self.window.run_command('open_url', {'url': 'http://{}:{}'.format(host, port)}), 100)
 
 
 class DjangoRunCustomCommand(DjangoSimpleCommand):
@@ -344,16 +347,6 @@ class DjangoTestAppCommand(DjangoAppCommand):
 
 class DjangoMakeMigrationCommand(DjangoSimpleCommand):
     command = 'makemigrations'
-
-
-class DjangoInitialSchemaMigrationCommand(DjangoAppCommand):
-    command = 'schemamigration'
-    extra_args = ['--initial']
-
-
-class DjangoSchemaMigrationCommand(DjangoAppCommand):
-    command = 'schemamigration'
-    extra_args = ['--auto']
 
 
 class DjangoListMigrationsCommand(DjangoSimpleCommand):

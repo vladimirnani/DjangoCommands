@@ -19,8 +19,8 @@
     "linux_terminal": "gnome-terminal",
     // Per project setting "python_interpreter" overrides "python_bin"
     "project_override": true,
-    
-
+    // Open browser pointint to root url after runserver command
+    "browser_after_runserver": false,
     // Example Settings THIS SETTINGS ARE PER PROJECT FILE inside the settings 
         "server_custom_command": 
         {
