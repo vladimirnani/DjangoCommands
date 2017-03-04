@@ -62,8 +62,11 @@ class DjangoCommand(sublime_plugin.WindowCommand):
             version = self.settings.get("python_version")
             return which(self.interpreter_versions[version])
 
-    def get_version(self):
-        binary = self.get_executable()
+    def get_version(self, extb=None):
+        if extb is None:
+            binary = self.get_executable()
+        else:
+            binary = extb
         command = [binary, '-c', 'import django;print(django.get_version())']
 
         try:
@@ -80,6 +83,7 @@ class DjangoCommand(sublime_plugin.WindowCommand):
         django_project_root = \
             sublime.active_window().active_view().settings().get('django_project_root') \
             or self.settings.get('django_project_root')
+        print(django_project_root)
         for path in [django_project_root] if django_project_root else sublime.active_window().folders():
             for root, dirs, files in os.walk(path):
                 if 'manage.py' in files:
@@ -687,12 +691,14 @@ class DjangoNewProjectCommand(SetVirtualEnvCommand):
         name, self.interpreter = self.choices[index]
         if name is not "default":
             self.interpreter = os.path.join(self.interpreter, 'python')
+        if self.get_version(self.interpreter) == 0:
+            self.error_msg = "No module 'django' found in the selected environment"
+            self.display_error_message()
+            return
         self.window.show_input_panel(
             "Project name", "", self.check_folders, None, None)
 
     def run(self):
-        if self.get_version() == 0:
-            return
         venv_paths = self.settings.get("python_virtualenv_paths", [])
         version = self.settings.get("python_version")
         envs = self.find_virtualenvs(venv_paths)
@@ -720,6 +726,7 @@ class DjangoNewAppCommand(DjangoSimpleCommand):
 
     def run(self):
         if self.get_version() == 0:
+            self.display_error_message()
             return
         self.extra_args = list()
         self.window.show_input_panel(
