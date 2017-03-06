@@ -759,3 +759,17 @@ class DjangoSearchDocsCommand(DjangoCommand):
         else:
             selection = ''
         self.window.show_input_panel('Search:', selection, self.on_done, None, None)
+
+
+class DjangoSideSettingsCommand(sublime_plugin.WindowCommand):
+
+    def run(self, file, settings=True):
+        self.window.run_command('new_window')
+        window = sublime.active_window()
+        window.run_command('open_file', {'file': SETTINGS_FILE if settings else 'Default.sublime-keymap'})
+        window.run_command('set_layout', {
+            "cols": [0.0, 0.5, 1.0],
+            "rows": [0.0, 1.0],
+            "cells": [[0, 0, 1, 1], [1, 0, 2, 1]]
+        })
+        window.run_command('open_file', {'file': file})
