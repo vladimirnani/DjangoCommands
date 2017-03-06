@@ -53,8 +53,6 @@ Everything tested and running!
 * __Install your dependencies__
 * __Install new pip packages__
 * __Open and search in django documentation from the editor__
-* __Create new projects from ST__
-* __Start new apps__
 * __Run custom servers__
 * __PostgreSQL specific features snippets__
 * __And More!__
@@ -119,16 +117,20 @@ Currently supports following commands:
  * `python_virtualenv_paths`: list of paths where virtualenvs are located (ex:`~/.virtualenvs/`)\* 
  * `server_host`: host for the runserver command
  * `server_port`: port for the server to listen
- * `linux_terminal`: Only Linux setting for command line emulator\*\*
+ * `linux_terminal`: Linux only setting for command line emulator\*\*
  * `project_override`: (Boolean) Per project setting "python_interpreter" overrides "python_bin"
  
  * `server_custom_command`: Per project setting to specify a custom server to run (ex: {"command": "gunicorn", "args":["--workers=3"]})\*\*\* 
  
+***
+
 \*It's important to set your envs directories
 
 \*The folders in this list should be the parent folder of the virtualenv folder, not the virtualenv folder itself
 
 \*\*Check that your 'linux\_terminal' setting uses an underscore "\_"
+
+\*\*Default is `x-terminal-emulator` with a fallback to `xterm`
 
 \*\*\*use any script you want
 

@@ -29,6 +29,7 @@ class DjangoCommand(sublime_plugin.WindowCommand):
 
     def __init__(self, *args, **kwargs):
         self.settings = sublime.load_settings(SETTINGS_FILE)
+        # @TODO:check this on windows
         self.interpreter_versions = {2: "python2",
                                      3: "python3"} if PLATFORM is not "Windows" else {2: "python", 3: "python"}
         sublime_plugin.WindowCommand.__init__(self, *args, **kwargs)
@@ -122,10 +123,11 @@ class DjangoCommand(sublime_plugin.WindowCommand):
     def define_terminal(self):
         global TERMINAL
         if PLATFORM == "Linux":
-            TERMINAL = self.settings.get('linux_terminal')
-            if TERMINAL is None:
-                TERMINAL = self.settings.get(
-                    'linux-terminal', 'gnome-terminal')
+            TERMINAL = self.settings.get('linux_terminal', 'xterm')
+            if not os.access(which(TERMINAL), os.X_OK):
+                self.error_msg = 'terminal emulator not found: {}\nUsing fallback instead'.format(TERMINAL)
+                self.display_error_message()
+                TERMINAL = 'xterm' if TERMINAL == 'x-terminal-emulator' else 'x-terminal-emulator'
 
     def display_error_message(self):
         sublime.error_message(self.error_msg)

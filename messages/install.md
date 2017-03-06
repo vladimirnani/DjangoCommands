@@ -13,8 +13,10 @@
 #########################################################################################
 
 
-- Ctrl + Shift + A: opens a menu with all Django commands
+- Ctrl + Shift + A: opens a menu with all Django commands.
 
-- Remember to set the path to the directory where your virtual environments are install in "python_virtualenv_paths" for the plugin to work correclty
+- Remember to set the path to the directory where your virtual environments are installed in "python_virtualenv_paths" for the plugin to work correclty, as many directories as you need can be added.
 
-- Enjoy and please let us know if you run into any issue 
+- Enjoy and please let us know if you run into any issue.
+
+   :smile:
