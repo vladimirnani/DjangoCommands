@@ -81,7 +81,6 @@ Currently supports following commands:
  * `Django: Run Server`
  * `Django: Run Custom Server`
  * `Django: Boilerplate`
- * `Django: Sync Database`
  * `Django: Test`
  * `Django: Test All`
  * `Django: Shell`
@@ -92,12 +91,9 @@ Currently supports following commands:
  * `Django: Help`
  * `Django: Open Docs`
  * `Django: Search in Docs`
- * `Django: Use Default Interpreter`
  * `Django: Make Migration`
  * `Django: SQLMigration` 
  * `Django: Migrate Database`
- * `Django: Initial Schema Migration`
- * `Django: Schema Migration`
  * `Django: List Migrations`
  * `Django: Click`
 
@@ -109,6 +105,7 @@ Currently supports following commands:
  * `Django: Pip Install Packages`
  * `Django: Pip Install Requirements`
  * `Django: Set Project Interpreter`
+ * `Django: Use Default Interpreter`
 
 ### Settings
 
@@ -118,11 +115,15 @@ Currently supports following commands:
  * `server_host`: host for the runserver command
  * `server_port`: port for the server to listen
  * `linux_terminal`: Linux only setting for command line emulator\*\*
+ * `shell_executable`: For OSX and Linux, set your preferred shell for the commands to be launched in.
+ * `browser_after_runserver`: set true to open a browser pointing to the root url after a run server command.
  * `project_override`: (Boolean) Per project setting "python_interpreter" overrides "python_bin"
  
- * `server_custom_command`: Per project setting to specify a custom server to run (ex: {"command": "gunicorn", "args":["--workers=3"]})\*\*\* 
+ * `server_custom_command`: Per project setting to specify a custom server to run
  
 ***
+
+#### Each setting has it's own explanation and some examples of use at the default settings file.
 
 \*It's important to set your envs directories
 
@@ -132,7 +133,6 @@ Currently supports following commands:
 
 \*\*Default is `x-terminal-emulator` with a fallback to `xterm`
 
-\*\*\*use any script you want
 
 ### Please report any issue, bug, enhacement or comment [here](https://github.com/vladimirnani/DjangoCommands/issues) 
 ### We'll be glad to read and work on all of them
