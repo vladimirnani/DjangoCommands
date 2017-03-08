@@ -189,14 +189,7 @@ class CommandThread(threading.Thread):
                 '-e', 'bash -c \"{0}; read line\"'.format(command)
             ]
         if PLATFORM == 'Darwin':
-            command = [
-                'osascript',
-                '-e', 'tell app "Terminal" to activate',
-                '-e', 'tell application "System Events" to tell process \
-                "Terminal" to keystroke "t" using command down',
-                '-e', 'tell application "Terminal" to \
-                do script "{0}" in front window'.format(command)
-            ]
+            command = ["open", "-a", TERMINAL].extend(command)
 
         log('Command is : {0}'.format(str(command)))
         try:
@@ -444,8 +437,8 @@ class TerminalHereCommand(VirtualEnvCommand):
         if PLATFORM == 'Windows':
             command = ['cmd', '/k', '{}'.format(os.path.join(bin_dir, self.command))]
         if PLATFORM == 'Linux' or PLATFORM == 'Darwin':
-            shell = self.get_shell()
-            command = [shell, "--rcfile", "<(echo '. ~/.bashrc && . {}')".format(os.path.join(bin_dir, self.command))]
+            command = [self.get_shell(),
+                       "--rcfile", "<(echo '. ~/.bashrc && . {}')".format(os.path.join(bin_dir, self.command))]
         thread = CommandThread(command, notsplit=True)
         thread.start()
 
