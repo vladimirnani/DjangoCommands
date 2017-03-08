@@ -1,5 +1,4 @@
 {
   "install": "messages/install.md",
-  "1.6.0": "messages/whitespace.md",
-  "1.6.2": "messages/errormessages.md"
+  "1.7.5": "messages/important.md"
 }

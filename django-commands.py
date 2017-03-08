@@ -29,7 +29,6 @@ class DjangoCommand(sublime_plugin.WindowCommand):
 
     def __init__(self, *args, **kwargs):
         self.settings = sublime.load_settings(SETTINGS_FILE)
-        # @TODO:check this on windows
         self.interpreter_versions = {2: "python2",
                                      3: "python3"} if PLATFORM is not "Windows" else {2: "python", 3: "python"}
         sublime_plugin.WindowCommand.__init__(self, *args, **kwargs)
@@ -80,11 +79,18 @@ class DjangoCommand(sublime_plugin.WindowCommand):
             version = re.match(r'(\d\.\d+)', output.decode('utf-8')).group(0)
             return version
 
+    def get_shell(self):
+        shell = self.settings.get('shell_executable', 'bash')
+        if not os.access(shell, os.X_OK):
+            self.error_msg = "{} not found. Bash will be used as a fallback".format(shell)
+            self.display_error_message()
+            shell = 'bash'
+        return shell
+
     def find_manage_py(self):
         django_project_root = \
             sublime.active_window().active_view().settings().get('django_project_root') \
             or self.settings.get('django_project_root')
-        print(django_project_root)
         for path in [django_project_root] if django_project_root else sublime.active_window().folders():
             for root, dirs, files in os.walk(path):
                 if 'manage.py' in files:
@@ -191,7 +197,7 @@ class CommandThread(threading.Thread):
         try:
             subprocess.Popen(command, env=env, cwd=self.cwd)
         except (subprocess.CalledProcessError, ValueError, OSError) as e:
-            sublime.message_dialog("{}".format(e))
+            sublime.error_message("{}".format(e))
 
 
 class DjangoSimpleCommand(DjangoCommand):
@@ -303,10 +309,6 @@ class DjangoRunCustomCommand(DjangoSimpleCommand):
             return
         else:
             thread.start()
-
-
-class DjangoSyncdbCommand(DjangoSimpleCommand):
-    command = 'syncdb'
 
 
 class DjangoShellCommand(DjangoSimpleCommand):
@@ -437,7 +439,8 @@ class TerminalHereCommand(VirtualEnvCommand):
         if PLATFORM == 'Windows':
             command = ['cmd', '/k', '{}'.format(os.path.join(bin_dir, self.command))]
         if PLATFORM == 'Linux' or PLATFORM == 'Darwin':
-            command = ["bash", "--rcfile", "<(echo '. ~/.bashrc && . {}')".format(os.path.join(bin_dir, self.command))]
+            shell = self.get_shell()
+            command = [shell, "--rcfile", "<(echo '. ~/.bashrc && . {}')".format(os.path.join(bin_dir, self.command))]
         thread = CommandThread(command, notsplit=True)
         thread.start()
 
@@ -754,3 +757,18 @@ class DjangoSearchDocsCommand(DjangoCommand):
         else:
             selection = ''
         self.window.show_input_panel('Search:', selection, self.on_done, None, None)
+
+
+class DjangoSideSettingsCommand(sublime_plugin.WindowCommand):
+
+    def run(self, file, settings=True):
+        self.window.run_command('new_window')
+        window = sublime.active_window()
+        window.run_command('open_file', {'file': SETTINGS_FILE if settings else 'Default.sublime-keymap'})
+        window.active_view().set_read_only(True)
+        window.run_command('set_layout', {
+            "cols": [0.0, 0.5, 1.0],
+            "rows": [0.0, 1.0],
+            "cells": [[0, 0, 1, 1], [1, 0, 2, 1]]
+        })
+        window.run_command('open_file', {'file': file})

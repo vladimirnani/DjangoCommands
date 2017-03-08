@@ -1,11 +1,15 @@
-Django manage commands 1.7.3
+Django manage commands 1.7.5
 
  - Fallback for 'linux-terminal' setting with a dash is dropped, now is essential to use 'linux_terminal' setting with and underscore.
 
  - Linux extended compatibility dropping 'gnome-terminal' in favor of 'x-terminal-emulator' as the default 'linux_terminal' setting and with 'xterm' as a fallback.
 
- - Mac OSX users now can select their preferred terminal emulator to visualize command output, run python/django shell, etc; And define their own way to open said terminal through AppleScript(osascript).
+ - Easier access to user settings and keybindings, now showing both default and user defined files side by side to ease the definition of user settings.
 
- - Windows users now can choose among other options of terminals, beside classic cmd prompt, like 'powershell' and 'git bash' and definitively would add support for other emulators, please feel free to sugest one.
+ - Mac OSX users now can select their preferred terminal emulator to be triggered to run the corresponding command.
+
+ - Linux and Mac OSX now can define their preferred shell to run commands in. E.g: Bash, Zsh, Fish, etc. It will be checked that the shell executable exists and its accesible and, if not, will fallback to bash.
+
+ - Windows users, would you like to be able to select another terminal instead of cmd.exe like mintty, cmder or git-bash? If so please open an Issue(only one please so others can comment on it, and keep the issue tracker organized) at our github repo and let us know.
 
  - Minor fixes and performance optimizations.

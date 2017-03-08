@@ -16,10 +16,6 @@
         "command": "django_run_custom"
     },
     {
-        "caption": "Django: Sync Database",
-        "command": "django_syncdb"
-    },
-    {
         "caption": "Django: Migrate Database",
         "command": "django_migrate"
     },
