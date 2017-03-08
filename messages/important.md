@@ -1,4 +1,4 @@
-Django manage commands 1.7.5
+Django manage commands 1.7.7
 
  - Fallback for 'linux-terminal' setting with a dash is dropped, now is essential to use 'linux_terminal' setting with and underscore.
 
