@@ -114,7 +114,8 @@ Currently supports following commands:
  * `python_virtualenv_paths`: list of paths where virtualenvs are located (ex:`~/.virtualenvs/`)\* 
  * `server_host`: host for the runserver command
  * `server_port`: port for the server to listen
- * `linux_terminal`: Linux only setting for command line emulator\*\*
+ * `linux_terminal`: Linux only, used to define a custom command line emulator\*\*
+ * `osx_terminal`: Mac OSX only, used to define a custom terminal emulator.\*\*\*
  * `shell_executable`: For OSX and Linux, set your preferred shell for the commands to be launched in.
  * `browser_after_runserver`: set true to open a browser pointing to the root url after a run server command.
  * `project_override`: (Boolean) Per project setting "python_interpreter" overrides "python_bin"
@@ -129,10 +130,9 @@ Currently supports following commands:
 
 \*The folders in this list should be the parent folder of the virtualenv folder, not the virtualenv folder itself
 
-\*\*Check that your 'linux\_terminal' setting uses an underscore "\_"
-
 \*\*Default is `x-terminal-emulator` with a fallback to `xterm`
 
+\*\*\*Default is "Terminal"
 
 ### Please report any issue, bug, enhacement or comment [here](https://github.com/vladimirnani/DjangoCommands/issues) 
 ### We'll be glad to read and work on all of them
