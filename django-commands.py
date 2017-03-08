@@ -168,13 +168,8 @@ class CommandThread(threading.Thread):
         env = os.environ.copy()
 
         if PLATFORM == 'Windows':
-            command = ['cmd.exe', '/k', self.command[0], '{}'.format(self.command[1])]
-            for index, param in enumerate(self.command):
-                if(index < 2):
-                    continue
-                else:
-                    if param:
-                        command.append(param)
+            command = ['cmd.exe', '/k']
+            command.extend(self.command)
             command.extend(['&&', 'timeout', '/T', '10', '&&', 'exit'])
 
         elif(self.notsplit):
