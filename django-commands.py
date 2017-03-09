@@ -79,14 +79,6 @@ class DjangoCommand(sublime_plugin.WindowCommand):
             version = re.match(r'(\d\.\d+)', output.decode('utf-8')).group(0)
             return version
 
-    def get_shell(self):
-        shell = self.settings.get('shell_executable', 'bash')
-        if not os.access(shell, os.X_OK):
-            self.error_msg = "{} not found. Bash will be used as a fallback".format(shell)
-            self.display_error_message()
-            shell = 'bash'
-        return shell
-
     def find_manage_py(self):
         django_project_root = \
             sublime.active_window().active_view().settings().get('django_project_root') \
@@ -433,8 +425,7 @@ class TerminalHereCommand(VirtualEnvCommand):
         if PLATFORM == 'Windows':
             command = ['cmd', '/k', '{}'.format(os.path.join(bin_dir, self.command))]
         if PLATFORM == 'Linux' or PLATFORM == 'Darwin':
-            command = [self.get_shell(),
-                       "--rcfile", "<(echo '. ~/.bashrc && . {}')".format(os.path.join(bin_dir, self.command))]
+            command = ["bash", "--rcfile", "<(echo '. ~/.bashrc && . {}')".format(os.path.join(bin_dir, self.command))]
         thread = CommandThread(command, notsplit=True)
         thread.start()
 

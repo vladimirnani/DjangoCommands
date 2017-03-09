@@ -19,8 +19,6 @@
     "linux_terminal": "x-terminal-emulator",
     // Mac OSX only: define your preferred_terminal_emulator
     "osx_terminal": "Terminal",
-    // Shell
-    "shell_executable": "bash",
     // Per project setting "python_interpreter" overrides "python_bin"
     "project_override": true,
     // Open browser pointint to root url after runserver command

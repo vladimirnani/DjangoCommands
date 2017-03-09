@@ -116,10 +116,8 @@ Currently supports following commands:
  * `server_port`: port for the server to listen
  * `linux_terminal`: Linux only, used to define a custom command line emulator\*\*
  * `osx_terminal`: Mac OSX only, used to define a custom terminal emulator.\*\*\*
- * `shell_executable`: For OSX and Linux, set your preferred shell for the commands to be launched in.
  * `browser_after_runserver`: set true to open a browser pointing to the root url after a run server command.
  * `project_override`: (Boolean) Per project setting "python_interpreter" overrides "python_bin"
- 
  * `server_custom_command`: Per project setting to specify a custom server to run
  
 ***
@@ -132,7 +130,7 @@ Currently supports following commands:
 
 \*\*Default is `x-terminal-emulator` with a fallback to `xterm`
 
-\*\*\*Default is "Terminal"
+\*\*\*Default is `Terminal`
 
 ### Please report any issue, bug, enhacement or comment [here](https://github.com/vladimirnani/DjangoCommands/issues) 
 ### We'll be glad to read and work on all of them

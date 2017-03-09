@@ -8,8 +8,8 @@ Django manage commands 1.7.9
 
  - Mac OSX users now can select their preferred terminal emulator to be triggered to run the corresponding command. Use `osx_terminal` setting.
 
- - Linux and Mac OSX now can define their preferred shell to run commands in. E.g: Bash, Zsh, Fish, etc. It will be checked that the shell executable exists and its accesible and, if not, will fallback to bash.
-
  - Windows users, would you like to be able to select another terminal instead of cmd.exe like mintty, cmder or git-bash? If so please open an Issue(only one please so others can comment on it, and keep the issue tracker organized) at our github repo and let us know.
 
- - Minor fixes and performance optimizations.
+ - Windows slight performance optimization.
+
+ - Minor fixes.
