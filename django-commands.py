@@ -120,13 +120,14 @@ class DjangoCommand(sublime_plugin.WindowCommand):
 
     def define_terminal(self):
         global TERMINAL
-        settings_names = {"Linux": "linux_terminal", "Darwin": "osx_terminal"}
-        fallbacks = {"Linux": "xterm", "Darwin": "Terminal"}
-        TERMINAL = self.settings.get(settings_names.get(PLATFORM), fallbacks.get(PLATFORM))
-        if not which(TERMINAL, mode=os.F_OK | os.X_OK):
-            self.error_msg = 'terminal emulator not found: {}\nUsing fallback instead'.format(TERMINAL)
-            self.display_error_message()
-            TERMINAL = fallbacks.get(PLATFORM)
+        if PLATFORM != 'Windows':
+            settings_names = {"Linux": "linux_terminal", "Darwin": "osx_terminal"}
+            fallbacks = {"Linux": "xterm", "Darwin": "Terminal"}
+            TERMINAL = self.settings.get(settings_names.get(PLATFORM), fallbacks.get(PLATFORM))
+            if not which(TERMINAL, mode=os.F_OK | os.X_OK):
+                self.error_msg = 'terminal emulator not found: {}\nUsing fallback instead'.format(TERMINAL)
+                self.display_error_message()
+                TERMINAL = fallbacks.get(PLATFORM)
 
     def display_error_message(self):
         sublime.error_message(self.error_msg)
