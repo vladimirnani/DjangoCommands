@@ -87,10 +87,9 @@ class DjangoCommand(sublime_plugin.WindowCommand):
             for root, dirs, files in os.walk(path):
                 if 'manage.py' in files:
                     return os.path.join(root, 'manage.py')
-                else:
-                    self.error = True
-                    self.error_msg = "manage.py not found, unable to proceed"
-                    return None
+        self.error = True
+        self.error_msg = "manage.py not found, unable to proceed"
+        return None
 
     def choose(self, choices, action):
         on_input = partial(action, choices)
