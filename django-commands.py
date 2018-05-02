@@ -162,7 +162,7 @@ class CommandThread(threading.Thread):
 
         if PLATFORM == 'Windows':
             command = ['cmd.exe', '/k']
-            command.extend(self.command)
+            command.extend(list(filter(None, self.command)))
             command.extend(['&&', 'timeout', '/T', '10', '&&', 'exit'])
 
         elif(self.notsplit):
